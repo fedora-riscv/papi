@@ -1,0 +1,12 @@
+diff -ur papi-3.7.0.orig/src/papi_internal.c papi-3.7.0.patches/src/papi_internal.c
+--- papi-3.7.0.orig/src/papi_internal.c	2009-08-26 20:01:25.000000000 +0100
++++ papi-3.7.0.patches/src/papi_internal.c	2009-10-09 10:14:39.665680864 +0100
+@@ -107,7 +107,7 @@
+       PAPIERROR(str);
+ 
+       if (_papi_hwi_error_level == PAPI_VERB_ESTOP)
+-         exit(-errorCode);
++         abort ();
+       else
+          return errorCode;
+       break;

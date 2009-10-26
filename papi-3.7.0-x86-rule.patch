@@ -1,0 +1,18 @@
+diff -up src/Rules.pfm_pcl.x86 src/Rules.pfm_pcl
+--- src/Rules.pfm_pcl.x86	2009-08-24 16:21:29.000000000 -0400
++++ src/Rules.pfm_pcl	2009-09-29 11:11:14.000000000 -0400
+@@ -74,12 +74,9 @@ ifeq (pcl, $(SUBSTR))
+   MISCSRCS += sys_perf_counter_open.c
+ endif
+ 
+-ifneq (CRAYX2, $(COMPILER))
+-  ifneq (ia64, $(ARCH))
+-    ifneq (ppc64, $(ARCH))
++# Additional ARCH settings for x86
++ifeq (86, $(findstring 86,$(ARCH)))
+       MISCSRCS +=  x86_cache_info.c
+-    endif
+-  endif
+ endif
+ 
+ # This is necessary to avoid text relocations. You cannot do -Lxx -lx because
