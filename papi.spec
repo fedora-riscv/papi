@@ -1,7 +1,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 3.7.0
-Release: 10
+Release: 11%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
@@ -79,6 +79,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_mandir}/man3/*
 
 %changelog
+* Mon Oct 26 2009 William Cohen <wcohen@redhat.com> - 3.7.0-11
+- Add distro to release.
+
 * Fri Oct 09 2009 William Cohen <wcohen@redhat.com> - 3.7.0-10
 - Eliminate the papi-static subpackage.
 
