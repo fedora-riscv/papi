@@ -1,16 +1,12 @@
 Summary: Performance Application Programming Interface
 Name: papi
-Version: 3.7.0
-Release: 11%{?dist}
+Version: 3.7.1
+Release: 3%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
 Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
-Patch1: papi-3.7.0-multiplex.patch
-Patch2: papi-3.7.0-x86-rule.patch
-Patch3: papi-3.7.0-soname.patch
-Patch4: papi-3.7.0-exit.patch
 BuildRequires: ncurses-devel
 BuildRequires: gcc-gfortran
 BuildRequires: kernel-devel >= 2.6.31
@@ -31,17 +27,12 @@ that uses PAPI.
 
 %prep
 %setup -q
-%patch1 -p0 -b .multiplex
-%patch2 -p0 -b .x86
-%patch3 -p1 -b .soname
-%patch4 -p1 -b .exit
-
 
 %build
 cd src
 PERF_HEAD=`ls /usr/src/kernels/*/include/linux/perf_counter.h|sort |tail -n 1` || exit 1
-ln -s $PERF_HEAD perf_counter.h
-%configure --with-pcl=yes --disable-static
+PERF_HEADER=`dirname $PERF_HEAD`
+%configure --with-pcl=yes --with-pcl-incdir=$PERF_HEADER --disable-static
 make %{?_smp_mflags}
 
 #%check
@@ -79,6 +70,15 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_mandir}/man3/*
 
 %changelog
+* Mon Nov 16 2009 William Cohen <wcohen@redhat.com> - 3.7.1-3
+- Adjust configure.
+
+* Mon Nov 16 2009 William Cohen <wcohen@redhat.com> - 3.7.1-2
+- Bump version.
+
+* Mon Nov 16 2009 William Cohen <wcohen@redhat.com> - 3.7.1-1
+- Import papi-3.7.1.
+
 * Mon Oct 26 2009 William Cohen <wcohen@redhat.com> - 3.7.0-11
 - Add distro to release.
 
