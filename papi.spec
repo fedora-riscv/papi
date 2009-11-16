@@ -1,7 +1,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 3.7.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
@@ -31,8 +31,8 @@ that uses PAPI.
 %build
 cd src
 PERF_HEAD=`ls /usr/src/kernels/*/include/linux/perf_counter.h|sort |tail -n 1` || exit 1
-ln -s $PERF_HEAD perf_counter.h
-%configure --with-pcl=yes --disable-static
+PERF_HEADER=`dirname $PERF_HEAD`
+%configure --with-pcl=yes --with-pcl-incdir=$PERF_HEADER --disable-static
 make %{?_smp_mflags}
 
 #%check
@@ -70,6 +70,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_mandir}/man3/*
 
 %changelog
+* Mon Nov 16 2009 William Cohen <wcohen@redhat.com> - 3.7.1-3
+- Adjust configure.
+
 * Mon Nov 16 2009 William Cohen <wcohen@redhat.com> - 3.7.1-2
 - Bump version.
 
