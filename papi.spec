@@ -1,7 +1,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 3.7.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
@@ -70,6 +70,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_mandir}/man3/*
 
 %changelog
+* Mon Nov 16 2009 William Cohen <wcohen@redhat.com> - 3.7.1-2
+- Bump version.
+
 * Mon Nov 16 2009 William Cohen <wcohen@redhat.com> - 3.7.1-1
 - Import papi-3.7.1.
 
