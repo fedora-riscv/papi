@@ -1,7 +1,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 3.7.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
@@ -11,6 +11,8 @@ BuildRequires: ncurses-devel
 BuildRequires: gcc-gfortran
 BuildRequires: kernel-devel >= 2.6.31
 BuildRequires: chrpath
+#Right now libpfm does not know anything about s390 and will fail
+ExcludeArch: s390, s390x
 
 %description
 PAPI provides a programmer interface to monitor the performance of
@@ -70,6 +72,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_mandir}/man3/*
 
 %changelog
+* Thu Nov 19 2009 William Cohen <wcohen@redhat.com> - 3.7.1-4
+- Exclude s390 and s390x.
+
 * Mon Nov 16 2009 William Cohen <wcohen@redhat.com> - 3.7.1-3
 - Adjust configure.
 
