@@ -1,15 +1,15 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 3.7.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
 Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: ncurses-devel
+BuildRequires: kernel-headers >= 2.6.31
 BuildRequires: gcc-gfortran
-BuildRequires: kernel-devel >= 2.6.31
 BuildRequires: chrpath
 #Right now libpfm does not know anything about s390 and will fail
 ExcludeArch: s390, s390x
@@ -32,9 +32,7 @@ that uses PAPI.
 
 %build
 cd src
-PERF_HEAD=`ls /usr/src/kernels/*/include/linux/perf_counter.h|sort |tail -n 1` || exit 1
-PERF_HEADER=`dirname $PERF_HEAD`
-%configure --with-pcl=yes --with-pcl-incdir=$PERF_HEADER --disable-static
+%configure --with-pcl=yes --disable-static --with-pcl-incdir=/usr/include/linux
 make %{?_smp_mflags}
 
 #%check
@@ -72,6 +70,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_mandir}/man3/*
 
 %changelog
+* Mon Dec 9 2009 William Cohen <wcohen@redhat.com> - 3.7.2-2
+- Remove dependency on kernel-devel.
+
 * Mon Dec 9 2009 William Cohen <wcohen@redhat.com> - 3.7.2-1
 - Import papi-3.7.2.
 
