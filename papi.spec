@@ -1,11 +1,12 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 4.0.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
 Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
+Patch1: papi-4.0.0-patch1.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: ncurses-devel
 BuildRequires: gcc-gfortran
@@ -29,6 +30,7 @@ that uses PAPI.
 
 %prep
 %setup -q
+%patch1 -p1
 
 %build
 cd src
@@ -71,5 +73,11 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_mandir}/man1/*
 
 %changelog
+* Mon Feb 08 2010 William Cohen <wcohen@redhat.com> - 4.0.0-2
+- correct the ctests/shlib test
+- have PAPI_set_multiplex() return proper value
+- properly handle event unit masks
+- correct PAPI_name_to_code() to match events
+
 * Wed Jan 13 2010 William Cohen <wcohen@redhat.com> - 4.0.0-1
 - Generate papi.spec file for papi-4.0.0.
