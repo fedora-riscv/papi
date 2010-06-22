@@ -1,19 +1,18 @@
 Summary: Performance Application Programming Interface
 Name: papi
-Version: 4.0.0
-Release: 2%{?dist}
+Version: 4.1.0
+Release: 1%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
 Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
-Patch1: papi-4.0.0-patch1.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: ncurses-devel
 BuildRequires: gcc-gfortran
 BuildRequires: kernel-headers >= 2.6.31
 BuildRequires: chrpath
 #Right now libpfm does not know anything about s390 and will fail
-ExcludeArch: s390, s390x
+ExcludeArch: s390 s390x
 
 %description
 PAPI provides a programmer interface to monitor the performance of
@@ -30,12 +29,12 @@ that uses PAPI.
 
 %prep
 %setup -q
-%patch1 -p1
 
 %build
 cd src
-%configure --disable-static
-make
+%configure --with-static-lib=no --with-shared-lib=yes --with-shlib
+#DBG workaround to make sure libpfm just uses the normal CFLAGS
+DBG="" make
 
 #%check
 #cd src
@@ -73,11 +72,24 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_mandir}/man1/*
 
 %changelog
-* Mon Feb 08 2010 William Cohen <wcohen@redhat.com> - 4.0.0-2
+* Mon Jun 8 2010 William Cohen <wcohen@redhat.com> - 4.1.0-1
+- Rebase to papi-4.1.0
+
+* Mon May 17 2010 William Cohen <wcohen@redhat.com> - 4.0.0-5
+- Test run with upstream cvs version.
+
+* Wed Feb 10 2010 William Cohen <wcohen@redhat.com> - 4.0.0-4
+- Resolves: rhbz562935 Rebase to papi-4.0.0 (correct ExcludeArch).
+
+* Wed Feb 10 2010 William Cohen <wcohen@redhat.com> - 4.0.0-3
+- Resolves: rhbz562935 Rebase to papi-4.0.0 (bump nvr).
+
+* Wed Feb 10 2010 William Cohen <wcohen@redhat.com> - 4.0.0-2
 - correct the ctests/shlib test
 - have PAPI_set_multiplex() return proper value
 - properly handle event unit masks
 - correct PAPI_name_to_code() to match events
+- Resolves: rhbz562935 Rebase to papi-4.0.0 
 
 * Wed Jan 13 2010 William Cohen <wcohen@redhat.com> - 4.0.0-1
 - Generate papi.spec file for papi-4.0.0.
