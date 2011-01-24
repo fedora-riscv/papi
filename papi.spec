@@ -1,6 +1,6 @@
 Summary: Performance Application Programming Interface
 Name: papi
-Version: 4.1.1
+Version: 4.1.2.1
 Release: 1%{?dist}
 License: BSD
 Group: Development/System
@@ -72,6 +72,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_mandir}/man1/*
 
 %changelog
+* Mon Jan 24 2011 William Cohen <wcohen@redhat.com> - 4.1.2.1-1
+- Rebase to papi-4.1.2.1
+
 * Fri Oct 1 2010 William Cohen <wcohen@redhat.com> - 4.1.1-1
 - Rebase to papi-4.1.1
 
