@@ -1,7 +1,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 4.1.3
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
@@ -72,6 +72,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_mandir}/man1/*
 
 %changelog
+* Thu May 12 2011 William Cohen <wcohen@redhat.com> - 4.1.3-2
+- Use corrected papi-4.1.3.
+
 * Thu May 12 2011 William Cohen <wcohen@redhat.com> - 4.1.3-1
 - Rebase to papi-4.1.3
 
