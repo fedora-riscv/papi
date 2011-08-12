@@ -1,7 +1,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 4.1.3
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
@@ -27,6 +27,14 @@ PAPI-devel includes the C header files that specify the PAPI userspace
 libraries and interfaces. This is required for rebuilding any program
 that uses PAPI.
 
+%package static
+Summary: Static libraries for the compiling programs with PAPI
+Group: Development/System
+Requires: papi = %{version}-%{release}
+%description static
+PAPI-static includes the static versions of the library files for
+the PAPI userspace libraries and interfaces.
+
 %prep
 %setup -q
 
@@ -46,10 +54,6 @@ cd src
 make DESTDIR=$RPM_BUILD_ROOT install
 
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/*.so*
-
-# Remove the static libraries. Static libraries are undesirable:
-# https://fedoraproject.org/wiki/Packaging/Guidelines#Packaging_Static_Libraries
-rm -rf $RPM_BUILD_ROOT%{_libdir}/*.a
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -71,7 +75,14 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_mandir}/man3/*
 %doc %{_mandir}/man1/*
 
+%files static
+%defattr(-,root,root,-)
+%{_libdir}/*.a
+
 %changelog
+* Fri Aug 12 2011 William Cohen <wcohen@redhat.com> - 4.1.3-3
+- Provide papi-static.
+
 * Thu May 12 2011 William Cohen <wcohen@redhat.com> - 4.1.3-2
 - Use corrected papi-4.1.3.
 
