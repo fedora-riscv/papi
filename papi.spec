@@ -1,7 +1,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
-Version: 4.1.3
-Release: 3%{?dist}
+Version: 4.2.0
+Release: 1%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
@@ -11,6 +11,10 @@ BuildRequires: ncurses-devel
 BuildRequires: gcc-gfortran
 BuildRequires: kernel-headers >= 2.6.32
 BuildRequires: chrpath
+# Following required for net component
+BuildRequires: net-tools
+# Following required for inifiband component
+BuildRequires: libibmad-devel 
 #Right now libpfm does not know anything about s390 and will fail
 ExcludeArch: s390 s390x
 
@@ -40,7 +44,20 @@ the PAPI userspace libraries and interfaces.
 
 %build
 cd src
-%configure --with-static-lib=no --with-shared-lib=yes --with-shlib
+%configure --with-libpfm4 \
+--with-static-lib=yes --with-shared-lib=yes --with-shlib \
+--with-components="acpi coretemp example net"
+#components currently left out because of build configure/build issues
+#--with-components="cuda infiniband lmsensors lustre mx"
+
+pushd components
+#pushd cuda; ./configure; popd
+pushd infiniband; ./configure; popd
+#pushd lmsensors; ./configure; popd
+#pushd mx; ./configure ; popd
+pushd net; ./configure; popd
+popd
+
 #DBG workaround to make sure libpfm just uses the normal CFLAGS
 DBG="" make
 
@@ -70,7 +87,7 @@ rm -rf $RPM_BUILD_ROOT
 %files devel
 %defattr(-,root,root,-)
 %{_includedir}/*.h
-%{_includedir}/perfmon
+%{_includedir}/perfmon/*.h
 %{_libdir}/*.so
 %doc %{_mandir}/man3/*
 %doc %{_mandir}/man1/*
@@ -80,6 +97,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Thu Oct 27 2011 William Cohen <wcohen@redhat.com> - 4.2.0-1
+- Rebase to papi-4.2.0.
+
 * Fri Aug 12 2011 William Cohen <wcohen@redhat.com> - 4.1.3-3
 - Provide papi-static.
 
