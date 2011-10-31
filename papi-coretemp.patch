@@ -1,0 +1,269 @@
+diff -up papi-4.2.0/src/components/coretemp/linux-coretemp.c.orig papi-4.2.0/src/components/coretemp/linux-coretemp.c
+--- papi-4.2.0/src/components/coretemp/linux-coretemp.c.orig	2011-10-31 11:14:17.986533514 -0400
++++ papi-4.2.0/src/components/coretemp/linux-coretemp.c	2011-10-31 11:15:40.593663642 -0400
+@@ -13,6 +13,8 @@
+ 
+ #define INVALID_RESULT -1000000L
+ 
++papi_vector_t _coretemp_vector;
++
+ /* temporary event */
+ struct temp_event {
+   char name[PAPI_MAX_STR_LEN];
+@@ -23,8 +25,8 @@ struct temp_event {
+ };
+ 
+ static struct temp_event* root = NULL;
+-static CORETEMP_native_enent_entry_t * _coretemp_native_events;
+-static int NUM_EVENTS		= 0;
++static CORETEMP_native_event_entry_t * _coretemp_native_events;
++static int num_events		= 0;
+ static int is_initialized	= 0;
+ 
+ /*******************************************************************************
+@@ -146,17 +148,17 @@ int coretemp_init_substrate( )
+   is_initialized = 1;
+   /* This is the prefered method, all coretemp sensors are symlinked here
+    * see $(kernel_src)/Documentation/hwmon/sysfs-interface */
+-  NUM_EVENTS = generateEventList("/sys/class/hwmon");
++  num_events = generateEventList("/sys/class/hwmon");
+ 
+-  if ( NUM_EVENTS < 0 ) 
+-	return ( NUM_EVENTS );
++  if ( num_events < 0 ) 
++	return ( num_events );
+ 
+-  if ( NUM_EVENTS == 0 ) 
++  if ( num_events == 0 ) 
+ 	return ( PAPI_OK );
+ 
+   t = root;
+-  _coretemp_native_events = (CORETEMP_native_enent_entry_t*)
+-	papi_malloc(sizeof(CORETEMP_native_enent_entry_t) * NUM_EVENTS);
++  _coretemp_native_events = (CORETEMP_native_event_entry_t*)
++	papi_malloc(sizeof(CORETEMP_native_event_entry_t) * num_events);
+ 
+   do {
+ 	strncpy(_coretemp_native_events[i].name,t->name,PAPI_MAX_STR_LEN);
+@@ -169,7 +171,10 @@ int coretemp_init_substrate( )
+ 	i++;
+   } while (t != NULL);
+   root = NULL;
+-  return (PAPI_OK);
++
++  _coretemp_vector.cmp_info.num_native_events = num_events;
++
++  return PAPI_OK;
+ }
+ 
+ 
+@@ -206,7 +211,7 @@ int coretemp_init_control_state( hwd_con
+ {
+   int i;
+ 
+-  for ( i=0; i < NUM_EVENTS; i++ )
++  for ( i=0; i < num_events; i++ )
+ 	( ( CORETEMP_control_state_t *) ctl )->counts[i] = getEventValue(i);
+   
+   ( ( CORETEMP_control_state_t *) ctl)->lastupdate = PAPI_get_real_usec();
+@@ -233,7 +238,7 @@ int coretemp_read( hwd_context_t *ctx, h
+   int i;
+ 
+   if ( now - control->lastupdate > REFRESH_LAT ) {
+-	for ( i = 0; i < NUM_EVENTS; i++ ) {
++	for ( i = 0; i < num_events; i++ ) {
+ 	  control->counts[i] = getEventValue( i );
+ 	}
+ 	control->lastupdate = now;
+@@ -250,7 +255,7 @@ int coretemp_stop( hwd_context_t *ctx, h
+   CORETEMP_control_state_t* control = (CORETEMP_control_state_t*) ctl;
+   int i;
+ 
+-  for ( i = 0; i < NUM_EVENTS; i++ ) {
++  for ( i = 0; i < num_events; i++ ) {
+ 	control->counts[i] = getEventValue( i );
+   }
+ 
+@@ -376,27 +381,31 @@ coretemp_ntv_enum_events( unsigned int *
+ 
+ 	switch ( modifier ) {
+ 	case PAPI_ENUM_FIRST:
++
++	  if (num_events==0) {
++	    return PAPI_ENOEVNT;
++	  }
+ 		*EventCode = PAPI_NATIVE_MASK | PAPI_COMPONENT_MASK( cidx );
+ 
+-		return ( PAPI_OK );
++		return PAPI_OK;
+ 		break;
+ 
+ 	case PAPI_ENUM_EVENTS:
+ 	{
+ 		int index = *EventCode & PAPI_NATIVE_AND_MASK & PAPI_COMPONENT_AND_MASK;
+ 
+-		if ( index < NUM_EVENTS - 1 ) {
++		if ( index < num_events - 1 ) {
+ 			*EventCode = *EventCode + 1;
+-			return ( PAPI_OK );
++			return PAPI_OK;
+ 		} else
+-			return ( PAPI_ENOEVNT );
++			return PAPI_ENOEVNT;
+ 
+ 		break;
+ 	}
+ 	default:
+-		return ( PAPI_EINVAL );
++		return PAPI_EINVAL;
+ 	}
+-	return ( PAPI_EINVAL );
++	return PAPI_EINVAL;
+ }
+ 
+ /*
+@@ -407,7 +416,7 @@ coretemp_ntv_code_to_name( unsigned int 
+ {
+ 	int index = EventCode & PAPI_NATIVE_AND_MASK & PAPI_COMPONENT_AND_MASK;
+ 
+-	if ( index >= 0 && index < NUM_EVENTS ) {
++	if ( index >= 0 && index < num_events ) {
+ 	  strncpy( name, _coretemp_native_events[index].name, len );
+ 	  return ( PAPI_OK );
+ 	}
+@@ -422,7 +431,7 @@ coretemp_ntv_code_to_descr( unsigned int
+ {
+ 	int index = EventCode & PAPI_NATIVE_AND_MASK & PAPI_COMPONENT_AND_MASK;
+ 
+-	if ( index >= 0 && index < NUM_EVENTS ) {
++	if ( index >= 0 && index < num_events ) {
+ 	
+ 	  strncpy( name, _coretemp_native_events[index].description, len );
+ 	}
+@@ -437,7 +446,7 @@ coretemp_ntv_code_to_bits( unsigned int 
+ {
+ 	int index = EventCode & PAPI_NATIVE_AND_MASK & PAPI_COMPONENT_AND_MASK;
+ 
+-	if ( 0 > index || NUM_EVENTS <= index )
++	if ( 0 > index || num_events <= index )
+ 	  return ( PAPI_ENOEVNT );
+ 	memcpy( ( CORETEMP_register_t * ) bits,
+ 			&( _coretemp_native_events[index].resources ),
+@@ -454,8 +463,8 @@ papi_vector_t _coretemp_vector = {
+ 	.cmp_info = {
+ 				 /* default component information (unspecified values are initialized to 0) */
+ 				 .name =
+-				 "$Id: linux-coretemp.c,v 1.13 2011/10/25 15:20:41 vweaver1 Exp $",
+-				 .version = "$Revision: 1.13 $",
++				 "$Id: linux-coretemp.c,v 1.16 2011/10/28 16:03:51 vweaver1 Exp $",
++				 .version = "$Revision: 1.16 $",
+ 				 .num_mpx_cntrs = PAPI_MPX_DEF_DEG,
+ 				 .num_cntrs = CORETEMP_MAX_COUNTERS,
+ 				 .default_domain = PAPI_DOM_USER,
+diff -up papi-4.2.0/src/components/coretemp/linux-coretemp.h.orig papi-4.2.0/src/components/coretemp/linux-coretemp.h
+--- papi-4.2.0/src/components/coretemp/linux-coretemp.h.orig	2011-10-31 11:14:25.471534638 -0400
++++ papi-4.2.0/src/components/coretemp/linux-coretemp.h	2011-10-31 11:15:40.620534716 -0400
+@@ -4,7 +4,7 @@
+ 
+ /** 
+  * @file    linux-coretemp.h
+- * CVS:     $Id: linux-coretemp.h,v 1.1 2010/08/31 20:54:23 ralph Exp $
++ * CVS:     $Id: linux-coretemp.h,v 1.2 2011/10/28 15:55:56 vweaver1 Exp $
+  * @author  James Ralph
+  *			ralph@eecs.utk.edu
+  *
+@@ -20,8 +20,8 @@
+  *  - Based heavily upon the lm-sensors component by Heike Jagode.
+  */
+ 
+-#ifndef _PAPI_LMSENSORS_H
+-#define _PAPI_LMSENSORS_H
++#ifndef _PAPI_CORETEMP_H
++#define _PAPI_CORETEMP_H
+ 
+ #include <unistd.h>
+ #include <dirent.h>
+@@ -53,14 +53,13 @@ typedef struct CORETEMP_register
+ /** This structure is used to build the table of events */
+ typedef struct CORETEMP_native_event_entry
+ {
+-	/*LM_SENSORS_register_t resources; */
+   char name[PAPI_MAX_STR_LEN];
+   char description[PAPI_MAX_STR_LEN];
+   char path[PATH_MAX];
+   int stone; /* some counters are set in stone, a max temperature is just that... */
+   long value;
+   CORETEMP_register_t resources;
+-} CORETEMP_native_enent_entry_t;
++} CORETEMP_native_event_entry_t;
+ 
+ typedef struct CORETEMP_reg_alloc
+ {
+@@ -86,4 +85,4 @@ typedef struct CORETEMP_context
+  *******************************************************************************/
+ 
+ 
+-#endif /* _PAPI_LMSENSORS_H */
++#endif /* _PAPI_CORETEMP_H */
+diff -up papi-4.2.0/src/components/coretemp/Rules.coretemp.orig papi-4.2.0/src/components/coretemp/Rules.coretemp
+diff -up papi-4.2.0/src/components/coretemp/tests/coretemp_basic.c.orig papi-4.2.0/src/components/coretemp/tests/coretemp_basic.c
+--- papi-4.2.0/src/components/coretemp/tests/coretemp_basic.c.orig	2011-10-31 11:14:52.345550487 -0400
++++ papi-4.2.0/src/components/coretemp/tests/coretemp_basic.c	2011-10-31 11:15:40.621532177 -0400
+@@ -27,7 +27,8 @@ int main (int argc, char **argv)
+ 	int code;
+ 	char event_name[PAPI_MAX_STR_LEN];
+ 	int total_events=0;
+-
++	int r;
++	const PAPI_component_info_t *cmpinfo = NULL;
+ 
+         /* Set TESTS_QUIET variable */
+         tests_quiet( argc, argv );      
+@@ -46,14 +47,21 @@ int main (int argc, char **argv)
+ 
+ 	for(cid=0; cid<numcmp; cid++) {
+ 
+-	   if (!TESTS_QUIET) printf("\tComponent %d\n",cid);
++	   if (!TESTS_QUIET) {
++	      if ( (cmpinfo = PAPI_get_component_info(cid)) == NULL) {
++	         test_fail(__FILE__, __LINE__,"PAPI_get_component_info failed\n", 0);
++	      }
++	      printf("\tComponent %d - %s\n", cid, cmpinfo->name);
++	   }
+ 
+ 	   code = PAPI_NATIVE_MASK | PAPI_COMPONENT_MASK(cid);
+-           PAPI_enum_event( &code, PAPI_ENUM_FIRST );
+ 
+-	   while ( PAPI_enum_event( &code, PAPI_ENUM_EVENTS ) == PAPI_OK ) {
++           r = PAPI_enum_event( &code, PAPI_ENUM_FIRST );
++
++	   while ( r == PAPI_OK ) {
+ 	      retval = PAPI_event_code_to_name( code, event_name );
+ 	      if ( retval != PAPI_OK ) {
++		 printf("Error translating %x\n",code);
+ 	         test_fail( __FILE__, __LINE__, 
+                             "PAPI_event_code_to_name", retval );
+ 	      }
+@@ -101,6 +109,7 @@ int main (int argc, char **argv)
+ 
+ 	         total_events++;
+ 	      }
++	      r = PAPI_enum_event( &code, PAPI_ENUM_EVENTS );
+ 	   }
+         }
+ 
+diff -up papi-4.2.0/src/components/coretemp/tests/Makefile.orig papi-4.2.0/src/components/coretemp/tests/Makefile
+--- papi-4.2.0/src/components/coretemp/tests/Makefile.orig	2011-10-31 11:15:01.175663133 -0400
++++ papi-4.2.0/src/components/coretemp/tests/Makefile	2011-10-31 11:15:40.621532177 -0400
+@@ -5,9 +5,9 @@ include ../../Makefile_comp_tests
+ 
+ TESTS = coretemp_basic
+ 
+-example_tests: $(TESTS)
++coretemp_tests: $(TESTS)
+ 
+-coretemp_basic: coretemp_basic.o
++coretemp_basic: coretemp_basic.o $(UTILOBJS) $(PAPILIB)
+ 	$(CC) $(CFLAGS) $(INCLUDE) -o coretemp_basic coretemp_basic.o $(UTILOBJS) $(PAPILIB) $(LDFLAGS) 
+ 
+ 

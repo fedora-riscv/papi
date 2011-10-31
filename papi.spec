@@ -1,11 +1,12 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 4.2.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
 Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
+Patch1: papi-coretemp.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: ncurses-devel
 BuildRequires: gcc-gfortran
@@ -41,6 +42,7 @@ the PAPI userspace libraries and interfaces.
 
 %prep
 %setup -q
+%patch1 -p1 -b .temp
 
 %build
 cd src
@@ -83,6 +85,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.so.*
 /usr/share/papi
 %doc INSTALL.txt README LICENSE.txt RELEASENOTES.txt
+%doc %{_mandir}/man1/*
 
 %files devel
 %defattr(-,root,root,-)
@@ -90,13 +93,16 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/perfmon/*.h
 %{_libdir}/*.so
 %doc %{_mandir}/man3/*
-%doc %{_mandir}/man1/*
 
 %files static
 %defattr(-,root,root,-)
 %{_libdir}/*.a
 
 %changelog
+* Mon Oct 31 2011 William Cohen <wcohen@redhat.com> - 4.2.0-2
+- Include appropirate man pages with papi rpm. (rhbz749725)
+- Rebase to papi-4.2.0, fixup for coretemp component. (rhbz746851)
+
 * Thu Oct 27 2011 William Cohen <wcohen@redhat.com> - 4.2.0-1
 - Rebase to papi-4.2.0.
 
