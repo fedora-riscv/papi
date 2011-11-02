@@ -1,7 +1,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 4.2.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
@@ -73,6 +73,8 @@ cd src
 make DESTDIR=$RPM_BUILD_ROOT install
 
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/*.so*
+#hack to get rid of unwanted man1/
+rm $RPM_BUILD_ROOT/%{_mandir}/man1/*.c.1
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -99,6 +101,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Wed Nov 02 2011 William Cohen <wcohen@redhat.com> - 4.2.0-3
+- Remove unwanted man1/*.c.1 files. (rhbz749725)
+
 * Mon Oct 31 2011 William Cohen <wcohen@redhat.com> - 4.2.0-2
 - Include appropirate man pages with papi rpm. (rhbz749725)
 - Rebase to papi-4.2.0, fixup for coretemp component. (rhbz746851)
