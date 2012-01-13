@@ -1,7 +1,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 4.2.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
@@ -101,6 +101,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Fri Jan 13 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.2.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+
 * Wed Nov 02 2011 William Cohen <wcohen@redhat.com> - 4.2.0-3
 - Remove unwanted man1/*.c.1 files. (rhbz749725)
 
