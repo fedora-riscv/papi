@@ -1,21 +1,21 @@
 Summary: Performance Application Programming Interface
 Name: papi
-Version: 4.2.0
-Release: 4%{?dist}
+Version: 4.2.1
+Release: 1%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
 Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
-Patch1: papi-coretemp.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: ncurses-devel
 BuildRequires: gcc-gfortran
 BuildRequires: kernel-headers >= 2.6.32
 BuildRequires: chrpath
+BuildRequires: lm_sensors-devel
 # Following required for net component
 BuildRequires: net-tools
 # Following required for inifiband component
-BuildRequires: libibmad-devel 
+BuildRequires: libibmad-devel
 #Right now libpfm does not know anything about s390 and will fail
 ExcludeArch: s390 s390x
 
@@ -42,26 +42,27 @@ the PAPI userspace libraries and interfaces.
 
 %prep
 %setup -q
-%patch1 -p1 -b .temp
 
 %build
 cd src
 %configure --with-libpfm4 \
 --with-static-lib=yes --with-shared-lib=yes --with-shlib \
---with-components="acpi coretemp example net"
+--with-components="coretemp example lmsensors lustre mx net"
 #components currently left out because of build configure/build issues
-#--with-components="cuda infiniband lmsensors lustre mx"
+#--with-components="appio cuda infiniband vmware"
 
 pushd components
 #pushd cuda; ./configure; popd
-pushd infiniband; ./configure; popd
-#pushd lmsensors; ./configure; popd
-#pushd mx; ./configure ; popd
-pushd net; ./configure; popd
+pushd infiniband; %configure; popd
+pushd lmsensors; \
+ %configure --with-sensors_incdir=/usr/include/sensors \
+ --with-sensors_libdir=%{_libdir}; \
+ popd
+#pushd vmware; ./configure; popd
 popd
 
 #DBG workaround to make sure libpfm just uses the normal CFLAGS
-DBG="" make
+DBG="" make %{?_smp_mflags}
 
 #%check
 #cd src
@@ -73,8 +74,6 @@ cd src
 make DESTDIR=$RPM_BUILD_ROOT install
 
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/*.so*
-#hack to get rid of unwanted man1/
-rm $RPM_BUILD_ROOT/%{_mandir}/man1/*.c.1
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -101,6 +100,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Tue Feb 14 2012 William Cohen <wcohen@redhat.com> - 4.2.1-1
+- Rebase to 4.2.1.
+
 * Fri Jan 13 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.2.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
 
