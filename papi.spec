@@ -1,12 +1,11 @@
 Summary: Performance Application Programming Interface
 Name: papi
-Version: 4.2.1
-Release: 2%{?dist}
+Version: 4.4.0
+Release: 1%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
 Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
-Patch1: papi-bz797692.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: ncurses-devel
 BuildRequires: gcc-gfortran
@@ -43,7 +42,6 @@ the PAPI userspace libraries and interfaces.
 
 %prep
 %setup -q
-%patch1 -p1 -b .bz
 
 %build
 cd src
@@ -102,6 +100,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Fri Apr 20 2012 William Cohen <wcohen@redhat.com> - 4.4.0-1
+- Rebase to 4.4.0.
+
 * Fri Mar 9 2012 William Cohen <wcohen@redhat.com> - 4.2.1-2
 - Fix overrun in lmsensor component. (rhbz797692)
 
