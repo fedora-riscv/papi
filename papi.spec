@@ -1,7 +1,8 @@
+%bcond_with bundled_libpfm
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 4.4.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
@@ -12,6 +13,9 @@ BuildRequires: gcc-gfortran
 BuildRequires: kernel-headers >= 2.6.32
 BuildRequires: chrpath
 BuildRequires: lm_sensors-devel
+%if %{without bundled_libpfm}
+BuildRequires: libpfm-devel
+%endif
 # Following required for net component
 BuildRequires: net-tools
 # Following required for inifiband component
@@ -28,7 +32,7 @@ Summary: Header files for the compiling programs with PAPI
 Group: Development/System
 Requires: papi = %{version}-%{release}
 %description devel
-PAPI-devel includes the C header files that specify the PAPI userspace
+PAPI-devel includes the C header files that specify the PAPI user-space
 libraries and interfaces. This is required for rebuilding any program
 that uses PAPI.
 
@@ -38,14 +42,20 @@ Group: Development/System
 Requires: papi = %{version}-%{release}
 %description static
 PAPI-static includes the static versions of the library files for
-the PAPI userspace libraries and interfaces.
+the PAPI user-space libraries and interfaces.
 
 %prep
 %setup -q
 
 %build
+%if %{without bundled_libpfm}
+# Build our own copy of libpfm.
+%global libpfm_config --with-pfm-incdir=%{_includedir}/perfmon --with-pfm-libdir=%{_libdir}
+%endif
+
 cd src
 %configure --with-libpfm4 \
+%{?libpfm_config} \
 --with-static-lib=yes --with-shared-lib=yes --with-shlib \
 --with-components="coretemp example lmsensors lustre mx net"
 #components currently left out because of build configure/build issues
@@ -63,10 +73,6 @@ popd
 
 #DBG workaround to make sure libpfm just uses the normal CFLAGS
 DBG="" make %{?_smp_mflags}
-
-#%check
-#cd src
-#make fulltest
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -91,7 +97,9 @@ rm -rf $RPM_BUILD_ROOT
 %files devel
 %defattr(-,root,root,-)
 %{_includedir}/*.h
+%if %{with bundled_libpfm}
 %{_includedir}/perfmon/*.h
+%endif
 %{_libdir}/*.so
 %doc %{_mandir}/man3/*
 
@@ -100,6 +108,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Mon Jun 11 2012 William Cohen <wcohen@redhat.com> - 4.4.0-2
+- Unbundle libpfm4 from papi.
+- Correct description spellings.
+- Remove unused test section.
+
 * Fri Apr 20 2012 William Cohen <wcohen@redhat.com> - 4.4.0-1
 - Rebase to 4.4.0.
 
