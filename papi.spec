@@ -2,7 +2,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 4.4.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
@@ -15,6 +15,7 @@ BuildRequires: chrpath
 BuildRequires: lm_sensors-devel
 %if %{without bundled_libpfm}
 BuildRequires: libpfm-devel
+BuildRequires: libpfm-static
 %endif
 # Following required for net component
 BuildRequires: net-tools
@@ -108,6 +109,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Mon Jun 11 2012 William Cohen <wcohen@redhat.com> - 4.4.0-3
+- Correct build requires.
+
 * Mon Jun 11 2012 William Cohen <wcohen@redhat.com> - 4.4.0-2
 - Unbundle libpfm4 from papi.
 - Correct description spellings.
