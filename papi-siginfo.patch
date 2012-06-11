@@ -1,0 +1,12 @@
+diff -up papi-4.4.0/src/linux-context.h.siginfo papi-4.4.0/src/linux-context.h
+--- papi-4.4.0/src/linux-context.h.siginfo	2012-06-11 15:40:00.389999991 -0400
++++ papi-4.4.0/src/linux-context.h	2012-06-11 15:40:12.423000001 -0400
+@@ -4,7 +4,7 @@
+ /* Signal handling functions */
+ 
+ #undef hwd_siginfo_t
+-typedef struct siginfo hwd_siginfo_t;
++typedef siginfo_t hwd_siginfo_t;
+ 
+ #undef hwd_ucontext_t
+ typedef ucontext_t hwd_ucontext_t;

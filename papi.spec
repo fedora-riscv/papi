@@ -2,11 +2,12 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 4.4.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
 Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
+Patch1: papi-siginfo.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: ncurses-devel
 BuildRequires: gcc-gfortran
@@ -47,6 +48,7 @@ the PAPI user-space libraries and interfaces.
 
 %prep
 %setup -q
+%patch1 -p1
 
 %build
 %if %{without bundled_libpfm}
@@ -109,6 +111,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Mon Jun 11 2012 William Cohen <wcohen@redhat.com> - 4.4.0-4
+- Use siginfo_t rather than struct siginfo.
+
 * Mon Jun 11 2012 William Cohen <wcohen@redhat.com> - 4.4.0-3
 - Correct build requires.
 
