@@ -2,7 +2,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 4.4.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
@@ -111,6 +111,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Fri Jul 20 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.4.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
+
 * Mon Jun 11 2012 William Cohen <wcohen@redhat.com> - 4.4.0-4
 - Use siginfo_t rather than struct siginfo.
 
