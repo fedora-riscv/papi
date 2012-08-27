@@ -1,13 +1,12 @@
-%bcond_with bundled_libpfm
+%bcond_without bundled_libpfm
 Summary: Performance Application Programming Interface
 Name: papi
-Version: 4.4.0
-Release: 5%{?dist}
+Version: 5.0.0
+Release: 1%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
 Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
-Patch1: papi-siginfo.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: ncurses-devel
 BuildRequires: gcc-gfortran
@@ -48,7 +47,6 @@ the PAPI user-space libraries and interfaces.
 
 %prep
 %setup -q
-%patch1 -p1
 
 %build
 %if %{without bundled_libpfm}
@@ -60,9 +58,9 @@ cd src
 %configure --with-libpfm4 \
 %{?libpfm_config} \
 --with-static-lib=yes --with-shared-lib=yes --with-shlib \
---with-components="coretemp example lmsensors lustre mx net"
+--with-components="appio coretemp example lmsensors lustre mx net rapl stealtime"
 #components currently left out because of build configure/build issues
-#--with-components="appio cuda infiniband vmware"
+#--with-components="appio cuda vmware"
 
 pushd components
 #pushd cuda; ./configure; popd
@@ -101,7 +99,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %{_includedir}/*.h
 %if %{with bundled_libpfm}
-%{_includedir}/perfmon/*.h
+#%{_includedir}/perfmon/*.h
 %endif
 %{_libdir}/*.so
 %doc %{_mandir}/man3/*
@@ -111,6 +109,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Fri Aug 24 2012 William Cohen <wcohen@redhat.com> - 5.0.0-1
+- Rebase to 5.0.0.
+
 * Fri Jul 20 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.4.0-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
