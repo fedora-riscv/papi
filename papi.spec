@@ -1,8 +1,8 @@
-%bcond_without bundled_libpfm
+%bcond_with bundled_libpfm
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.0.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
@@ -109,6 +109,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Mon Aug 27 2012 William Cohen <wcohen@redhat.com> - 5.0.0-2
+- Keep libpfm unbundled.
+
 * Fri Aug 24 2012 William Cohen <wcohen@redhat.com> - 5.0.0-1
 - Rebase to 5.0.0.
 
