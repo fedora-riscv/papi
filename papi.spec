@@ -2,11 +2,12 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.0.0
-Release: 2%{?dist}
+Release: 5%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
 Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
+Patch5: papi-unbundled-libpfm4.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: ncurses-devel
 BuildRequires: gcc-gfortran
@@ -48,14 +49,16 @@ the PAPI user-space libraries and interfaces.
 %prep
 %setup -q
 
+%patch5 -p1
+
 %build
 %if %{without bundled_libpfm}
 # Build our own copy of libpfm.
-%global libpfm_config --with-pfm-incdir=%{_includedir}/perfmon --with-pfm-libdir=%{_libdir}
+%global libpfm_config --with-pfm-incdir=%{_includedir} --with-pfm-libdir=%{_libdir}
 %endif
 
 cd src
-%configure --with-libpfm4 \
+%configure --with-perf-events \
 %{?libpfm_config} \
 --with-static-lib=yes --with-shared-lib=yes --with-shlib \
 --with-components="appio coretemp example lmsensors lustre mx net rapl stealtime"
@@ -109,6 +112,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Thu Aug 30 2012 William Cohen <wcohen@redhat.com> - 5.0.0-5
+- Fixes to make papi with unbundled libpfm.
+
 * Mon Aug 27 2012 William Cohen <wcohen@redhat.com> - 5.0.0-2
 - Keep libpfm unbundled.
 

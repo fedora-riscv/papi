@@ -1,0 +1,359 @@
+commit bc9ddffc849009110176c9a4d9deedb679589856
+Author: Vince Weaver <vweaver1@eecs.utk.edu>
+Date:   Tue Aug 28 14:54:04 2012 -0400
+
+    Fix compiling with separate libpfm4
+    
+    The problem was if you used any of the --with-pfm-incdir
+    type directives to configure, it would them assume you wanted
+    a perfmon2 build.
+    
+    This removes that assumption.
+    
+    I did check this with perfmon2, perfctr, and perf_event builds
+    so hopefully I didn't break anything.
+
+diff --git a/src/configure b/src/configure
+index 50b76ed..1a802e2 100755
+--- a/src/configure
++++ b/src/configure
+@@ -5290,6 +5290,9 @@ fi
+ echo "$as_me:$LINENO: result: $shlib" >&5
+ echo "${ECHO_T}$shlib" >&6
+ 
++# default
++pfm_incdir="libpfm4/include/"
++
+ ##################################################
+ #          perfctr
+ ##################################################
+@@ -5358,6 +5361,7 @@ fi
+ fi
+ 
+ if test "$perfctr" != 0; then
++  pfm_incdir="libpfm-3.y/include/"
+   echo "$as_me:$LINENO: checking for perfctr version" >&5
+ echo $ECHO_N "checking for perfctr version... $ECHO_C" >&6
+   if test "$perfctr" = 7 -a "$arch" != "ppc64"; then
+@@ -5717,6 +5721,7 @@ if test "${with_perfmon+set}" = set; then
+   perfmon=$withval
+              user_specified_interface=perfmon
+ 	     force_perfmon2=yes
++	     pfm_incdir="libpfm-3.y/include"
+              perfmon=`echo ${perfmon} | sed 's/^ \t*//;s/ \t*$//'`
+              perfmon=`echo ${perfmon} | grep -e '[1-9]\.[0-9][0-9]*'`
+              if test "x$perfmon" = "x"; then
+@@ -5797,32 +5802,30 @@ fi
+ fi;
+ 
+ 
++
++
+ # Check whether --with-pfm_root or --without-pfm_root was given.
+ if test "${with_pfm_root+set}" = set; then
+   withval="$with_pfm_root"
+   pfm_root=$withval
+-            user_specified_interface=perfmon
+ fi;
+ 
+ # Check whether --with-pfm_prefix or --without-pfm_prefix was given.
+ if test "${with_pfm_prefix+set}" = set; then
+   withval="$with_pfm_prefix"
+   pfm_prefix=$withval
+-            user_specified_interface=perfmon
+ fi;
+ 
+ # Check whether --with-pfm_incdir or --without-pfm_incdir was given.
+ if test "${with_pfm_incdir+set}" = set; then
+   withval="$with_pfm_incdir"
+   pfm_incdir=$withval
+-            user_specified_interface=perfmon
+ fi;
+ 
+ # Check whether --with-pfm_libdir or --without-pfm_libdir was given.
+ if test "${with_pfm_libdir+set}" = set; then
+   withval="$with_pfm_libdir"
+   pfm_libdir=$withval
+-            user_specified_interface=perfmon
+ fi;
+ 
+ 
+@@ -5831,7 +5834,7 @@ fi;
+ ##################################################
+ perf_events=no
+ force_perf_events=no
+-pe_incdir="libpfm4/include/perfmon"
++pe_incdir="$pfm_incdir/perfmon"
+ 
+ 
+ # Check whether --with-perf_events or --without-perf_events was given.
+diff --git a/src/configure.in b/src/configure.in
+index 6e79436..6a36421 100644
+--- a/src/configure.in
++++ b/src/configure.in
+@@ -766,6 +766,9 @@ if test "$papiLIBS" != "shared static"; then
+ fi
+ AC_MSG_RESULT($shlib)
+ 
++# default
++pfm_incdir="libpfm4/include/"
++
+ ##################################################
+ #          perfctr
+ ##################################################
+@@ -788,6 +791,7 @@ if test "$cross_compiling" = "no" ; then
+ fi 
+ 
+ if test "$perfctr" != 0; then 
++  pfm_incdir="libpfm-3.y/include/"
+   AC_MSG_CHECKING(for perfctr version)
+   if test "$perfctr" = 7 -a "$arch" != "ppc64"; then
+     AC_MSG_ERROR([Perfctr 2.7.x only works on PPC64 machines. Patch kernel with 2.6.x.])
+@@ -871,6 +875,7 @@ AC_ARG_WITH(perfmon,
+             [perfmon=$withval 
+              user_specified_interface=perfmon
+ 	     force_perfmon2=yes
++	     pfm_incdir="libpfm-3.y/include"
+              perfmon=`echo ${perfmon} | sed 's/^[ \t]*//;s/[ \t]*$//'`
+              perfmon=`echo ${perfmon} | grep -e '[[1-9]]\.[[0-9]][[0-9]]*'`
+              if test "x$perfmon" = "x"; then
+@@ -906,22 +911,20 @@ AC_ARG_WITH(perfmon,
+                fi
+ 	         fi])
+ 
++
++
+ AC_ARG_WITH(pfm_root,
+            [  --with-pfm-root=<path>		Specify path to source tree (for use by developers only) ],
+-           [pfm_root=$withval
+-            user_specified_interface=perfmon])
++           [pfm_root=$withval])
+ AC_ARG_WITH(pfm_prefix,
+            [  --with-pfm-prefix=<path>		Specify prefix to installed pfm distribution ],
+-           [pfm_prefix=$withval
+-            user_specified_interface=perfmon])
++           [pfm_prefix=$withval])
+ AC_ARG_WITH(pfm_incdir,
+            [  --with-pfm-incdir=<path>		Specify directory of pfm header files in non-standard location ],
+-           [pfm_incdir=$withval
+-            user_specified_interface=perfmon])
++           [pfm_incdir=$withval])
+ AC_ARG_WITH(pfm_libdir,
+            [  --with-pfm-libdir=<path>		Specify directory of pfm library in non-standard location ],
+-           [pfm_libdir=$withval
+-            user_specified_interface=perfmon])
++           [pfm_libdir=$withval])
+ 
+ 
+ ##################################################
+@@ -929,7 +932,7 @@ AC_ARG_WITH(pfm_libdir,
+ ##################################################
+ perf_events=no
+ force_perf_events=no
+-pe_incdir="libpfm4/include/perfmon"
++pe_incdir="$pfm_incdir/perfmon"
+ 
+ AC_ARG_WITH(perf_events,
+               [  --with-perf-events		Specify use of Linux Performance Event (requires kernel 2.6.32 or greater)],
+commit f4465bbb633d6a123093fe20b7c1c091d3067a07
+Author: Vince Weaver <vweaver1@eecs.utk.edu>
+Date:   Tue Aug 28 14:55:30 2012 -0400
+
+    Add some spacing to the Rules.pfm4_pe
+    
+    Otherwise it was difficult figuring out what the nested set
+    of if/ifdefs was doing.
+
+diff --git a/src/Rules.pfm4_pe b/src/Rules.pfm4_pe
+index 25e7441..56a2f07 100644
+--- a/src/Rules.pfm4_pe
++++ b/src/Rules.pfm4_pe
+@@ -2,23 +2,23 @@
+ DESCR = "Linux with perf_event kernel support and libpfm4"
+ 
+ ifneq (/usr,$(PFM_PREFIX))
+-PWD = $(shell pwd)
+-ifeq (,$(PFM_LIB_PATH))
+-ifeq (,$(PFM_ROOT))
+-        PFM_ROOT := $(PWD)/libpfm4
+-endif
+-        PFM_LIB_PATH := $(PFM_ROOT)/lib
+-	CC_SHR += -Wl,-rpath-link -Wl,$(PFM_LIB_PATH)
+-endif
+-ifeq (,$(PFM_INC_PATH))
+-ifeq (,$(PFM_ROOT))
+-        PFM_ROOT := $(PWD)/libpfm4
+-endif
+-        PFM_INC_PATH := $(PFM_ROOT)/include
+-endif
+-ifneq (/usr/include,$(PFM_INC_PATH))
+-CFLAGS	+= -I$(PFM_INC_PATH)
+-endif
++   PWD = $(shell pwd)
++   ifeq (,$(PFM_LIB_PATH))
++      ifeq (,$(PFM_ROOT))
++         PFM_ROOT := $(PWD)/libpfm4
++      endif
++      PFM_LIB_PATH := $(PFM_ROOT)/lib
++      CC_SHR += -Wl,-rpath-link -Wl,$(PFM_LIB_PATH)
++   endif
++   ifeq (,$(PFM_INC_PATH))
++      ifeq (,$(PFM_ROOT))
++         PFM_ROOT := $(PWD)/libpfm4
++      endif
++      PFM_INC_PATH := $(PFM_ROOT)/include
++   endif
++   ifneq (/usr/include,$(PFM_INC_PATH))
++      CFLAGS	+= -I$(PFM_INC_PATH)
++   endif
+ endif
+ 
+ MISCHDRS += linux-lock.h mb.h papi_libpfm4_events.h $(PAPI_EVENTS_TABLE)
+commit 729a87213660a2136ea227c79313ebcc2eb97989
+Author: Vince Weaver <vweaver1@eecs.utk.edu>
+Date:   Tue Aug 28 17:02:07 2012 -0400
+
+    configure: don't check for libpfm if incdir specified
+    
+    When various --with-pfm values are passed, extra checks are done
+    against the libpfm library.  This was being done even if only
+    the include path was specified, which probably shouldn't be necessary.
+    
+    This broke things because a recent change I made had the
+    libpfm include path be always valid.
+
+diff --git a/src/configure b/src/configure
+index 1a802e2..dd18bbf 100755
+--- a/src/configure
++++ b/src/configure
+@@ -5407,11 +5407,11 @@ if test "$perfctr" != 0; then
+   dotest=0
+   if test "x$perfctr_root" != "x"; then
+     LIBS="-L$perfctr_root/usr.lib -lperfctr"
+-    CPPFLAGS="-I$perfctr_root/usr.lib -I$perfctr_root/linux/include"
++    CPPFLAGS="$CPPFLAGS -I$perfctr_root/usr.lib -I$perfctr_root/linux/include"
+     dotest=1
+   elif test "x$perfctr_prefix" != "x"; then
+     LIBS="-L$perfctr_prefix/lib -lperfctr"
+-    CPPFLAGS="-I$perfctr_prefix/include"
++    CPPFLAGS="$CPPFLAGS -I$perfctr_prefix/include"
+     perfctr_libdir="$perfctr_prefix/lib"
+     perfctr_incdir="$perfctr_prefix/include"
+     dotest=1
+@@ -5425,6 +5425,7 @@ if test "$perfctr" != 0; then
+       dotest=1
+     fi
+   fi
++
+   if test "$dotest" = 1; then
+     echo "$as_me:$LINENO: checking for vperfctr_open in -lperfctr" >&5
+ echo $ECHO_N "checking for vperfctr_open in -lperfctr... $ECHO_C" >&6
+@@ -5955,11 +5956,11 @@ if test "$perfmon" != 0 -o "$perf_events" = "yes"; then
+   dotest=0
+   if test "x$pfm_root" != "x"; then
+     LIBS="-L$pfm_root/lib -lpfm"
+-    CPPFLAGS="-I$pfm_root/include"
++    CPPFLAGS="$CPPFLAGS -I$pfm_root/include"
+     dotest=1
+   elif test "x$pfm_prefix" != "x"; then
+     LIBS="-L$pfm_prefix/lib -lpfm"
+-    CPPFLAGS="-I$pfm_prefix/include"
++    CPPFLAGS="$CPPFLAGS -I$pfm_prefix/include"
+     if test "x$pfm_libdir" = "x"; then
+       pfm_libdir="$pfm_prefix/lib"
+     fi
+@@ -5973,8 +5974,7 @@ if test "$perfmon" != 0 -o "$perf_events" = "yes"; then
+       dotest=1
+     fi
+     if test "x$pfm_incdir" != "x"; then
+-      CPPFLAGS="-I$pfm_incdir"
+-      dotest=1
++      CPPFLAGS="$CPPFLAGS -I$pfm_incdir"
+     fi
+   fi
+   if test "$dotest" = 1; then
+diff --git a/src/configure.in b/src/configure.in
+index 6a36421..c286c62 100644
+--- a/src/configure.in
++++ b/src/configure.in
+@@ -821,11 +821,11 @@ if test "$perfctr" != 0; then
+   dotest=0
+   if test "x$perfctr_root" != "x"; then
+     LIBS="-L$perfctr_root/usr.lib -lperfctr"
+-    CPPFLAGS="-I$perfctr_root/usr.lib -I$perfctr_root/linux/include"
++    CPPFLAGS="$CPPFLAGS -I$perfctr_root/usr.lib -I$perfctr_root/linux/include"
+     dotest=1
+   elif test "x$perfctr_prefix" != "x"; then
+     LIBS="-L$perfctr_prefix/lib -lperfctr"
+-    CPPFLAGS="-I$perfctr_prefix/include"
++    CPPFLAGS="$CPPFLAGS -I$perfctr_prefix/include"
+     perfctr_libdir="$perfctr_prefix/lib"
+     perfctr_incdir="$perfctr_prefix/include"
+     dotest=1
+@@ -839,6 +839,7 @@ if test "$perfctr" != 0; then
+       dotest=1
+     fi
+   fi
++
+   if test "$dotest" = 1; then
+     AC_CHECK_LIB([perfctr], [vperfctr_open], 
+                  [AC_CHECK_HEADERS([libperfctr.h], 
+@@ -1004,11 +1005,11 @@ if test "$perfmon" != 0 -o "$perf_events" = "yes"; then
+   dotest=0
+   if test "x$pfm_root" != "x"; then
+     LIBS="-L$pfm_root/lib -lpfm"
+-    CPPFLAGS="-I$pfm_root/include"
++    CPPFLAGS="$CPPFLAGS -I$pfm_root/include"
+     dotest=1
+   elif test "x$pfm_prefix" != "x"; then
+     LIBS="-L$pfm_prefix/lib -lpfm"
+-    CPPFLAGS="-I$pfm_prefix/include"
++    CPPFLAGS="$CPPFLAGS -I$pfm_prefix/include"
+     if test "x$pfm_libdir" = "x"; then
+       pfm_libdir="$pfm_prefix/lib"
+     fi
+@@ -1022,8 +1023,7 @@ if test "$perfmon" != 0 -o "$perf_events" = "yes"; then
+       dotest=1
+     fi
+     if test "x$pfm_incdir" != "x"; then
+-      CPPFLAGS="-I$pfm_incdir"
+-      dotest=1
++      CPPFLAGS="$CPPFLAGS -I$pfm_incdir"
+     fi
+   fi
+   if test "$dotest" = 1; then
+commit b978a744ee48a7e9cbb20bd77c28e0fc3e4eb19d
+Author: Vince Weaver <vweaver1@eecs.utk.edu>
+Date:   Wed Aug 29 12:59:45 2012 -0400
+
+    configure: fix autodetect perfmon case
+    
+    The fixes I made yesterday to libpfm include finding broke
+    on perfmon2 PAPI if you were letting the library be autodetected.
+    This change should fix things.  Tested on an actual 2.6.30
+    perfmon2 system.
+
+diff --git a/src/configure b/src/configure
+index dd18bbf..f4fdcb9 100755
+--- a/src/configure
++++ b/src/configure
+@@ -5787,6 +5787,7 @@ fi
+ fi
+ 
+                if test "$perfmon" != 0; then
++	         pfm_incdir="libpfm-3.y/include"
+                  perfmon=`echo ${perfmon} | sed 's/^ \t*//;s/ \t*$//'`
+                  perfmon=`echo ${perfmon} | grep -e '[1-9]\.[0-9][0-9]*'`
+                  perfmon=`echo ${perfmon} | sed 's/\.//'`
+diff --git a/src/configure.in b/src/configure.in
+index c286c62..3f465ad 100644
+--- a/src/configure.in
++++ b/src/configure.in
+@@ -898,6 +898,7 @@ AC_ARG_WITH(perfmon,
+                                             [perfmon=`cat /proc/perfmon | grep version | cut -d: -f2`],
+                                             [perfmon=0])])
+                if test "$perfmon" != 0; then
++	         pfm_incdir="libpfm-3.y/include"
+                  perfmon=`echo ${perfmon} | sed 's/^[ \t]*//;s/[ \t]*$//'`
+                  perfmon=`echo ${perfmon} | grep -e '[[1-9]]\.[[0-9]][[0-9]]*'`
+                  perfmon=`echo ${perfmon} | sed 's/\.//'`
