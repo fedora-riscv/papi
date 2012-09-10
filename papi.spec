@@ -2,12 +2,13 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.0.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
 Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
 Patch5: papi-unbundled-libpfm4.patch
+Patch6: papi-ivb.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: ncurses-devel
 BuildRequires: gcc-gfortran
@@ -50,6 +51,7 @@ the PAPI user-space libraries and interfaces.
 %setup -q
 
 %patch5 -p1
+%patch6 -p1
 
 %build
 %if %{without bundled_libpfm}
@@ -112,6 +114,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Mon Sep 10 2012 William Cohen <wcohen@redhat.com> - 5.0.0-6
+- Back port fixes for Intel Ivy Bridge event presets.
+
 * Thu Aug 30 2012 William Cohen <wcohen@redhat.com> - 5.0.0-5
 - Fixes to make papi with unbundled libpfm.
 
