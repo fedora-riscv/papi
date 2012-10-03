@@ -2,7 +2,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.0.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
@@ -14,8 +14,8 @@ BuildRequires: kernel-headers >= 2.6.32
 BuildRequires: chrpath
 BuildRequires: lm_sensors-devel
 %if %{without bundled_libpfm}
-BuildRequires: libpfm-devel
-BuildRequires: libpfm-static
+BuildRequires: libpfm-devel >= 4.3.0
+BuildRequires: libpfm-static >= 4.3.0
 %endif
 # Following required for net component
 BuildRequires: net-tools
@@ -109,6 +109,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Wed Oct 03 2012 William Cohen <wcohen@redhat.com> - 5.0.1-2
+- Make sure using compatible version of libpfm.
+
 * Thu Sep 20 2012 William Cohen <wcohen@redhat.com> - 5.0.1-1
 - Rebase to 5.0.1.
 
