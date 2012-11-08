@@ -1,0 +1,46 @@
+commit d239c350a17b0e329223f62e7efc1f786e3e7ac7
+Author: William Cohen <wcohen@redhat.com>
+Date:   Wed Nov 7 13:31:50 2012 -0500
+
+    Factor out duplicate install code from Rules.pfm4_pe
+    
+    The Makefile.inc has a rule to installed shared libraries.  However,
+    Rules.pfm4_pe also has a slightly different set of rules to install
+    code for shared libraries.  This leads to the same shared library
+    being installed under two different names.  The duplicate code has
+    been removed from Rules.pfm4_pe and a symbolic link has been added to
+    ensure that any code that might have linked with
+    libpapi.so.$(PAPIVER).$(PAPIREV).$(PAPIAGE) still runs.
+    
+    Signed-off-by: William Cohen <wcohen@redhat.com>
+
+diff --git a/src/Makefile.inc b/src/Makefile.inc
+index 1cdb270..e733ed9 100644
+--- a/src/Makefile.inc
++++ b/src/Makefile.inc
+@@ -308,6 +308,7 @@ install-lib: native_install
+ 	@if test -r $(SHLIB) ; then \
+ 		cp -p $(SHLIB) $(DESTDIR)$(LIBDIR)/libpapi.so.$(PAPIVER).$(PAPIREV).$(PAPIAGE).$(PAPIINC); \
+ 		chmod go+r $(DESTDIR)$(LIBDIR)/libpapi.so.$(PAPIVER).$(PAPIREV).$(PAPIAGE).$(PAPIINC) ; \
++		cd $(DESTDIR)$(LIBDIR); ln -sf libpapi.so.$(PAPIVER).$(PAPIREV).$(PAPIAGE).$(PAPIINC) libpapi.so.$(PAPIVER).$(PAPIREV).$(PAPIAGE); \
+ 		cd $(DESTDIR)$(LIBDIR); ln -sf libpapi.so.$(PAPIVER).$(PAPIREV).$(PAPIAGE).$(PAPIINC) libpapi.so.$(PAPIVER); \
+ 		cd $(DESTDIR)$(LIBDIR); ln -sf libpapi.so.$(PAPIVER).$(PAPIREV).$(PAPIAGE).$(PAPIINC) libpapi.so; \
+ 	fi
+diff --git a/src/Rules.pfm4_pe b/src/Rules.pfm4_pe
+index 56a2f07..0f83ec4 100644
+--- a/src/Rules.pfm4_pe
++++ b/src/Rules.pfm4_pe
+@@ -66,11 +66,8 @@ ifneq (,${PFM_ROOT})
+ 	-$(MAKE) -C $(PFM_ROOT) ARCH="$(ARCH)" DESTDIR=$(DESTDIR) PREFIX=$(PREFIX) install_prefix=$(PREFIX) LIBDIR=$(LIBDIR) INCDIR=$(INCDIR) MANDIR=$(MANDIR) install
+ endif
+ 	-install -d $(DESTDIR)$(LIBDIR)
+-ifneq (,$(findstring shared,$(LIBS)))
+-	cp -p $(SHLIB) $(DESTDIR)$(LIBDIR)/libpapi.so.$(PAPIVER).$(PAPIREV).$(PAPIAGE)
+-	cd $(DESTDIR)$(LIBDIR); ln -sf libpapi.so.$(PAPIVER).$(PAPIREV).$(PAPIAGE) libpapi.so.$(PAPIVER)
+-	cd $(DESTDIR)$(LIBDIR); ln -sf libpapi.so.$(PAPIVER).$(PAPIREV).$(PAPIAGE) libpapi.so
+-endif
++# Makefile.inc already has installation of shared libraries so
++# there is no need to do it here
+ 	-install -d $(DESTDIR)$(DATADIR)
+ 	cp -f ./papi_events.csv $(DESTDIR)$(DATADIR)
+ 

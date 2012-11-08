@@ -2,11 +2,12 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.0.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
 Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
+Patch200: papi-libversion.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: ncurses-devel
 BuildRequires: gcc-gfortran
@@ -47,6 +48,8 @@ the PAPI user-space libraries and interfaces.
 
 %prep
 %setup -q
+
+%patch200 -p1 -b .visible
 
 %build
 %if %{without bundled_libpfm}
@@ -109,6 +112,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Thu Nov 08 2012 William Cohen <wcohen@redhat.com> - 5.0.1-3
+- Avoid duplicated shared library.
+
 * Wed Oct 03 2012 William Cohen <wcohen@redhat.com> - 5.0.1-2
 - Make sure using compatible version of libpfm.
 
