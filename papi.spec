@@ -2,7 +2,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.0.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
@@ -81,7 +81,7 @@ DBG="" make %{?_smp_mflags}
 %install
 rm -rf $RPM_BUILD_ROOT
 cd src
-make DESTDIR=$RPM_BUILD_ROOT install
+make DESTDIR=$RPM_BUILD_ROOT LDCONFIG=/bin/true install
 
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/*.so*
 
@@ -102,7 +102,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %{_includedir}/*.h
 %if %{with bundled_libpfm}
-#%{_includedir}/perfmon/*.h
+%{_includedir}/perfmon/*.h
 %endif
 %{_libdir}/*.so
 %doc %{_mandir}/man3/*
@@ -112,6 +112,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Tue Dec 04 2012 William Cohen <wcohen@redhat.com> - 5.0.1-4
+- Disable ldconfig on install.
+
 * Thu Nov 08 2012 William Cohen <wcohen@redhat.com> - 5.0.1-3
 - Avoid duplicated shared library.
 
