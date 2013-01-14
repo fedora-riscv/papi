@@ -2,12 +2,13 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.0.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
 Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
 Patch200: papi-libversion.patch
+Patch201: papi-armv7a15.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: ncurses-devel
 BuildRequires: gcc-gfortran
@@ -50,6 +51,7 @@ the PAPI user-space libraries and interfaces.
 %setup -q
 
 %patch200 -p1 -b .visible
+%patch201 -p1 -b .armv7a15
 
 %build
 %if %{without bundled_libpfm}
@@ -112,6 +114,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Mon Jan 14 2013 William Cohen <wcohen@redhat.com> - 5.0.1-5
+- Add armv7 cortex a15 presets.
+
 * Tue Dec 04 2012 William Cohen <wcohen@redhat.com> - 5.0.1-4
 - Disable ldconfig on install.
 
