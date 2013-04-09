@@ -1,14 +1,12 @@
 %bcond_with bundled_libpfm
 Summary: Performance Application Programming Interface
 Name: papi
-Version: 5.0.1
-Release: 6%{?dist}
+Version: 5.1.0.2
+Release: 1%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
 Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
-Patch200: papi-libversion.patch
-Patch201: papi-armv7a15.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: ncurses-devel
 BuildRequires: gcc-gfortran
@@ -48,10 +46,7 @@ PAPI-static includes the static versions of the library files for
 the PAPI user-space libraries and interfaces.
 
 %prep
-%setup -q
-
-%patch200 -p1 -b .visible
-%patch201 -p1 -b .armv7a15
+%setup -q -n papi-5.1.0
 
 %build
 %if %{without bundled_libpfm}
@@ -114,6 +109,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Tue Apr 9 2013 William Cohen <wcohen@redhat.com> - 5.1.0.2-1
+- Rebase to 5.1.0.2
+
 * Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 5.0.1-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 
