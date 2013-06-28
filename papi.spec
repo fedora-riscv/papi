@@ -2,11 +2,12 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.1.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
 Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
+Patch200: papi-testsuite1.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: ncurses-devel
 BuildRequires: gcc-gfortran
@@ -37,6 +38,14 @@ PAPI-devel includes the C header files that specify the PAPI user-space
 libraries and interfaces. This is required for rebuilding any program
 that uses PAPI.
 
+%package testsuite
+Summary: Set of tests for checking PAPI functionality
+Group: Development/System
+Requires: papi = %{version}-%{release}
+%description testsuite
+PAPI-testuiste includes compiled versions of papi tests to ensure
+that PAPI functions on particular hardware.
+
 %package static
 Summary: Static libraries for the compiling programs with PAPI
 Group: Development/System
@@ -47,6 +56,8 @@ the PAPI user-space libraries and interfaces.
 
 %prep
 %setup -q
+
+%patch200 -p1
 
 %build
 %if %{without bundled_libpfm}
@@ -78,7 +89,7 @@ DBG="" make %{?_smp_mflags}
 %install
 rm -rf $RPM_BUILD_ROOT
 cd src
-make DESTDIR=$RPM_BUILD_ROOT LDCONFIG=/bin/true install
+make DESTDIR=$RPM_BUILD_ROOT LDCONFIG=/bin/true install-all
 
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/*.so*
 
@@ -104,11 +115,22 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.so
 %doc %{_mandir}/man3/*
 
+%files testsuite
+%defattr(-,root,root,-)
+/usr/share/papi/run_tests*
+/usr/share/papi/ctests
+/usr/share/papi/ftests
+/usr/share/papi/components
+/usr/share/papi/testlib
+
 %files static
 %defattr(-,root,root,-)
 %{_libdir}/*.a
 
 %changelog
+* Fri Jun 28 2013 William Cohen <wcohen@redhat.com> - 5.1.1-2
+- Add testsuite subpackage.
+
 * Thu May 30 2013 William Cohen <wcohen@redhat.com> - 5.1.1-1
 - Rebase to 5.1.1
 
