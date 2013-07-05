@@ -11,6 +11,7 @@ Patch200: papi-testsuite1.patch
 Patch210: papi-native-option.patch
 Patch211: papi-man.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
+BuildRequires: doxygen
 BuildRequires: ncurses-devel
 BuildRequires: gcc-gfortran
 BuildRequires: kernel-headers >= 2.6.32
