@@ -2,12 +2,14 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.1.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
 Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
 Patch200: papi-testsuite1.patch
+Patch210: papi-native-option.patch
+Patch211: papi-man.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: ncurses-devel
 BuildRequires: gcc-gfortran
@@ -58,6 +60,8 @@ the PAPI user-space libraries and interfaces.
 %setup -q
 
 %patch200 -p1
+%patch210 -p1
+%patch211 -p1
 
 %build
 %if %{without bundled_libpfm}
@@ -85,6 +89,13 @@ popd
 
 #DBG workaround to make sure libpfm just uses the normal CFLAGS
 DBG="" make %{?_smp_mflags}
+
+#generate updated versions of the documentation
+#DBG workaround to make sure libpfm just uses the normal CFLAGS
+pushd ../doc
+DBG="" make %{?_smp_mflags}
+DBG="" make %{?_smp_mflags} install
+popd
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -128,6 +139,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Fri Jul 5 2013 William Cohen <wcohen@redhat.com> - 5.1.1-3
+- Add man page corrections/updates.
+
 * Fri Jun 28 2013 William Cohen <wcohen@redhat.com> - 5.1.1-2
 - Add testsuite subpackage.
 
