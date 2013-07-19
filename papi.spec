@@ -2,7 +2,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.1.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
@@ -140,6 +140,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Fri Jul 19 2013 William Cohen <wcohen@redhat.com> - 5.1.1-4
+- Correct changelog.
+
 * Fri Jul 5 2013 William Cohen <wcohen@redhat.com> - 5.1.1-3
 - Add man page corrections/updates.
 
@@ -239,7 +242,7 @@ rm -rf $RPM_BUILD_ROOT
 * Fri Oct 1 2010 William Cohen <wcohen@redhat.com> - 4.1.1-1
 - Rebase to papi-4.1.1
 
-* Mon Jun 8 2010 William Cohen <wcohen@redhat.com> - 4.1.0-1
+* Tue Jun 22 2010 William Cohen <wcohen@redhat.com> - 4.1.0-1
 - Rebase to papi-4.1.0
 
 * Mon May 17 2010 William Cohen <wcohen@redhat.com> - 4.0.0-5
