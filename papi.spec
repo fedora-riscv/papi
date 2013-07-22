@@ -2,7 +2,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.1.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
@@ -12,6 +12,7 @@ Patch210: papi-native-option.patch
 Patch211: papi-man.patch
 Patch212: papi-shlib.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
+BuildRequires: autoconf
 BuildRequires: doxygen
 BuildRequires: ncurses-devel
 BuildRequires: gcc-gfortran
@@ -144,6 +145,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Mon Jul 22 2013 William Cohen <wcohen@redhat.com> - 5.1.1-6
+- Add autoconf buildrequires.
+
 * Mon Jul 22 2013 William Cohen <wcohen@redhat.com> - 5.1.1-5
 - rhbz986673 - /usr/lib64/libpapi.so is unowned
 - Package files in /usr/share/papi only once.
