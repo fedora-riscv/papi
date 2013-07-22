@@ -2,7 +2,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.1.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
@@ -10,6 +10,7 @@ Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
 Patch200: papi-testsuite1.patch
 Patch210: papi-native-option.patch
 Patch211: papi-man.patch
+Patch212: papi-shlib.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: doxygen
 BuildRequires: ncurses-devel
@@ -63,6 +64,7 @@ the PAPI user-space libraries and interfaces.
 %patch200 -p1
 %patch210 -p1
 %patch211 -p1
+%patch212 -p1 -b .shlib
 
 %build
 %if %{without bundled_libpfm}
@@ -71,6 +73,7 @@ the PAPI user-space libraries and interfaces.
 %endif
 
 cd src
+autoconf
 %configure --with-perf-events \
 %{?libpfm_config} \
 --with-static-lib=yes --with-shared-lib=yes --with-shlib \
@@ -94,8 +97,8 @@ DBG="" make %{?_smp_mflags}
 #generate updated versions of the documentation
 #DBG workaround to make sure libpfm just uses the normal CFLAGS
 pushd ../doc
-DBG="" make %{?_smp_mflags}
-DBG="" make %{?_smp_mflags} install
+DBG="" make
+DBG="" make install
 popd
 
 %install
@@ -114,7 +117,8 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %{_bindir}/*
 %{_libdir}/*.so.*
-/usr/share/papi
+%dir /usr/share/papi
+/usr/share/papi/papi_events.csv
 %doc INSTALL.txt README LICENSE.txt RELEASENOTES.txt
 %doc %{_mandir}/man1/*
 
@@ -140,6 +144,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Mon Jul 22 2013 William Cohen <wcohen@redhat.com> - 5.1.1-5
+- rhbz986673 - /usr/lib64/libpapi.so is unowned
+- Package files in /usr/share/papi only once.
+- Avoid dependency problem with parallel make of man pages.
+
 * Fri Jul 19 2013 William Cohen <wcohen@redhat.com> - 5.1.1-4
 - Correct changelog.
 
