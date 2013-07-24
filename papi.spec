@@ -2,7 +2,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.1.1
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
@@ -11,6 +11,7 @@ Patch200: papi-testsuite1.patch
 Patch210: papi-native-option.patch
 Patch211: papi-man.patch
 Patch212: papi-shlib.patch
+Patch213: papi-power8.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: autoconf
 BuildRequires: doxygen
@@ -66,6 +67,7 @@ the PAPI user-space libraries and interfaces.
 %patch210 -p1
 %patch211 -p1
 %patch212 -p1 -b .shlib
+%patch213 -p1 -b .power8
 
 %build
 %if %{without bundled_libpfm}
@@ -145,6 +147,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Wed Jul 24 2013 William Cohen <wcohen@redhat.com> - 5.1.1-7
+- rhbz830275 - Add support for POWER8 processor to PAPI
+
 * Mon Jul 22 2013 William Cohen <wcohen@redhat.com> - 5.1.1-6
 - Add autoconf buildrequires.
 

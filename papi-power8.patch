@@ -1,0 +1,180 @@
+commit c0c4caf4c1095fc6428d6773eea1f24ec496384a
+Author: Maynard Johnson <maynardj@us.ibm.com>
+Date:   Tue Jul 23 15:44:52 2013 -0500
+
+    Add initial support for IBM POWER8 processor
+    
+    Add initial support for IBM POWER8 processor
+    
+    The IBM POWER8 processor (to be publicly announced at some
+    future date) has some preliminary support in libpfm with
+    a subset of native events.  These POWER8-related libpfm
+    changes were pulled into PAPI on July 3, so further updates
+    in PAPI were required to support this new processor.  This
+    patch adds that required support.  NOTE: Due to the fact
+    that only a subset of native events have been publicised
+    at this point (and pushed into libpfm), not all of the
+    usual PAPI preset events have corresponding native events.
+    The rest of the POWER8 native events will be pushed
+    upstream once they are verified, and then we can flesh out
+    the PAPI preset events.
+    
+    With this initial POWER8 support patch, 5 of the ctests
+    and ftests fail, compared to 3 when PAPI is run on a POWER7.
+    At least one of the failing testcases is due to testing
+    being done on an early POWER8 processor with some known
+    hardware problems. We presume the number of failing tests
+    will decrease once we have GA-level hardware to test on.
+    
+    Signed-off-by: Maynard Johnson <maynardj@us.ibm.com>
+
+diff --git a/src/linux-memory.c b/src/linux-memory.c
+index 4a30da9..6c69fbd 100644
+--- a/src/linux-memory.c
++++ b/src/linux-memory.c
+@@ -486,7 +486,7 @@ PAPI_mh_info_t sys_mem_info[4] = {
+ 		,
+ 		.cache = {
+ 		[0] = { .type = PAPI_MH_TYPE_UNIFIED | PAPI_MH_TYPE_PSEUDO_LRU,
+-				.size = 262144, .line_size = 128, .num_lines = 256,
++				.size = 524288, .line_size = 128, .num_lines = 256,
+ 				.associativity = 8 }
+ 		,
+ 		[1] = { .type = PAPI_MH_TYPE_EMPTY, .size = -1, .line_size = -1,
+@@ -514,7 +514,74 @@ PAPI_mh_info_t sys_mem_info[4] = {
+ 	   }
+ 	  ,
+ 	  }
+-	 }						 // POWER7 end
++	 },						 // POWER7 end
++		{3,
++		 {
++		  [0] = { // level 1 begins
++			.tlb = {
++			/// POWER8 has an ERAT (Effective to Real Address
++			/// Translation) instead of a TLB.  For the purposes of this
++			/// data, we will treat it like a TLB.
++			[0] = { .type = PAPI_MH_TYPE_INST,
++					.num_entries = 72, .page_size = 0,
++					.associativity = SHRT_MAX }
++			,
++			[1] = { .type = PAPI_MH_TYPE_DATA,
++					.num_entries = 48, .page_size = 0,
++					.associativity = SHRT_MAX }
++			}
++			,
++			.cache = { // level 1 caches begin
++			[0] = { .type = PAPI_MH_TYPE_INST | PAPI_MH_TYPE_PSEUDO_LRU,
++					.size = 32768, .line_size = 128, .num_lines = 64,
++					.associativity = 8 }
++			,
++			[1] = { .type = PAPI_MH_TYPE_DATA | PAPI_MH_TYPE_WT | PAPI_MH_TYPE_LRU,
++					.size = 65536, .line_size = 128, .num_lines = 512,
++					.associativity = 8 }
++			}
++		   }
++		  ,
++		  [1] = { // level 2 begins
++			.tlb = {
++			[0] = { .type = PAPI_MH_TYPE_UNIFIED, .num_entries = 2048,
++				.page_size = 0, .associativity = 4 }
++			,
++			[1] = { .type = PAPI_MH_TYPE_EMPTY, .num_entries = -1,
++				.page_size = -1, .associativity = -1 }
++			}
++			,
++			.cache = {
++			[0] = { .type = PAPI_MH_TYPE_UNIFIED | PAPI_MH_TYPE_PSEUDO_LRU,
++					.size = 262144, .line_size = 128, .num_lines = 256,
++					.associativity = 8 }
++			,
++			[1] = { .type = PAPI_MH_TYPE_EMPTY, .size = -1, .line_size = -1,
++					.num_lines = -1, .associativity = -1 }
++			}
++		   }
++		  ,
++		  [2] = { // level 3 begins
++			.tlb = {
++			[0] = { .type = PAPI_MH_TYPE_EMPTY, .num_entries = -1,
++				.page_size = -1, .associativity = -1 }
++			,
++			[1] = { .type = PAPI_MH_TYPE_EMPTY, .num_entries = -1,
++				.page_size = -1, .associativity = -1 }
++			}
++			,
++			.cache = {
++			[0] = { .type = PAPI_MH_TYPE_UNIFIED | PAPI_MH_TYPE_PSEUDO_LRU,
++					.size = 8388608, .line_size = 128, .num_lines = 65536,
++					.associativity = 8 }
++			,
++			[1] = { .type = PAPI_MH_TYPE_EMPTY, .size = -1, .line_size = -1,
++					.num_lines = -1, .associativity = -1 }
++			}
++		   }
++		  ,
++		  }
++		 }						 // POWER8 end
+ };
+ 
+ #define SPRN_PVR 0x11F		 /* Processor Version Register */
+@@ -552,6 +619,9 @@ ppc64_get_memory_info( PAPI_hw_info_t * hw_info )
+ 	case 0x3F:				 /* POWER7 */
+ 		index = 3;
+ 		break;
++	case 0x4b:				 /*POWER8*/
++		index = 4;
++		break;
+ 	default:
+ 		index = -1;
+ 		break;
+diff --git a/src/papi_events.csv b/src/papi_events.csv
+index 58d3e68..2e0da80 100644
+--- a/src/papi_events.csv
++++ b/src/papi_events.csv
+@@ -1241,6 +1241,46 @@ PRESET,PAPI_BR_MSP,NOT_DERIVED,PM_BR_MPRED
+ PRESET,PAPI_BR_PRC,NOT_DERIVED,PM_BR_PRED
+ PRESET,PAPI_FXU_IDL,NOT_DERIVED,PM_FXU_IDLE
+ #
++CPU,POWER8
++CPU,power8
++#
++PRESET,PAPI_L1_DCM,DERIVED_ADD,PM_LD_MISS_L1,PM_ST_MISS_L1
++PRESET,PAPI_L1_LDM,NOT_DERIVED,PM_LD_MISS_L1
++PRESET,PAPI_L1_STM,NOT_DERIVED,PM_ST_MISS_L1
++PRESET,PAPI_L1_DCW,DERIVED_POSTFIX,N0|N1|-|,PM_ST_FIN,PM_ST_MISS_L1
++#n/aPRESET,PAPI_L1_DCA,DERIVED_POSTFIX,N0|N1|-|N2|+|,PM_ST_FIN,PM_ST_MISS_L1,PM_LD_REF_L1
++#n/aPRESET,PAPI_L1_DCR,DERIVED_ADD,PM_LD_REF_L1_LSU0,PM_LD_REF_L1_LSU1
++PRESET,PAPI_L2_DCM,NOT_DERIVED,PM_DATA_FROM_L2MISS
++#n/aPRESET,PAPI_L2_LDM,NOT_DERIVED,PM_L2_LD_MISS
++#n/aPRESET,PAPI_L2_STM,NOT_DERIVED,PM_L2_ST_MISS
++PRESET,PAPI_L3_DCR,NOT_DERIVED,PM_DATA_FROM_L2MISS
++#n/aPRESET,PAPI_L3_DCM,DERIVED_ADD,PM_DATA_FROM_LMEM,PM_DATA_FROM_RMEM
++#n/aPRESET,PAPI_L3_LDM,DERIVED_ADD,PM_DATA_FROM_LMEM,PM_DATA_FROM_RMEM
++#n/aPRESET,PAPI_L1_ICH,NOT_DERIVED,PM_INST_FROM_L1
++PRESET,PAPI_L1_ICM,NOT_DERIVED,PM_L1_ICACHE_MISS
++#n/aPRESET,PAPI_L2_ICM,NOT_DERIVED,PM_L2_INST_MISS
++#n/aPRESET,PAPI_L2_ICH,NOT_DERIVED,PM_INST_FROM_L2
++#n/aPRESET,PAPI_L3_ICA,NOT_DERIVED,PM_INST_FROM_L2MISS
++#n/aPRESET,PAPI_L3_ICH,NOT_DERIVED,PM_INST_FROM_L3
++PRESET,PAPI_L3_ICM,NOT_DERIVED,PM_INST_FROM_L3MISS
++#n/aPRESET,PAPI_FMA_INS,NOT_DERIVED,PM_VSU_FMA
++PRESET,PAPI_TOT_IIS,NOT_DERIVED,PM_INST_DISP
++PRESET,PAPI_TOT_INS,NOT_DERIVED,PM_INST_CMPL
++#n/aPRESET,PAPI_INT_INS,DERIVED_ADD,PM_FXU0_FIN,PM_FXU1_FIN
++PRESET,PAPI_FP_OPS,NOT_DERIVED,PM_FLOP
++PRESET,PAPI_FP_INS,NOT_DERIVED,PM_FLOP
++PRESET,PAPI_TOT_CYC,NOT_DERIVED,PM_RUN_CYC
++PRESET,PAPI_HW_INT,NOT_DERIVED,PM_EXT_INT
++PRESET,PAPI_STL_ICY,DERIVED_POSTFIX,N0|N1|-|,PM_RUN_CYC,PM_1PLUS_PPC_DISP
++PRESET,PAPI_SR_INS,NOT_DERIVED,PM_ST_FIN
++#n/aPRESET,PAPI_LD_INS,DERIVED_ADD,PM_LD_REF_L1,PM_LD_MISS_L1
++#/naPRESET,PAPI_LST_INS,NOT_DERIVED,PM_LSU_FIN
++#PRESET,PAPI_LST_INS,DERIVED_ADD,PM_LD_REF_L1,PM_LD_MISS_L1,PM_ST_FIN
++#n/aPRESET,PAPI_BR_INS,NOT_DERIVED,PM_BRU_FIN
++#n/aPRESET,PAPI_BR_MSP,NOT_DERIVED,PM_BR_MPRED
++#n/aPRESET,PAPI_BR_PRC,NOT_DERIVED,PM_BR_PRED
++#n/aPRESET,PAPI_FXU_IDL,NOT_DERIVED,PM_FXU_IDLE
++#
+ CPU,ultra12
+ #
+ PRESET,PAPI_TOT_CYC,NOT_DERIVED,CYCLE_CNT
