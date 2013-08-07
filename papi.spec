@@ -1,17 +1,12 @@
 %bcond_with bundled_libpfm
 Summary: Performance Application Programming Interface
 Name: papi
-Version: 5.1.1
-Release: 8%{?dist}
+Version: 5.2.0
+Release: 1%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
 Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
-Patch200: papi-testsuite1.patch
-Patch210: papi-native-option.patch
-Patch211: papi-man.patch
-Patch212: papi-shlib.patch
-Patch213: papi-power8.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: autoconf
 BuildRequires: doxygen
@@ -63,12 +58,6 @@ the PAPI user-space libraries and interfaces.
 %prep
 %setup -q
 
-%patch200 -p1
-%patch210 -p1
-%patch211 -p1
-%patch212 -p1 -b .shlib
-%patch213 -p1 -b .power8
-
 %build
 %if %{without bundled_libpfm}
 # Build our own copy of libpfm.
@@ -80,12 +69,13 @@ autoconf
 %configure --with-perf-events \
 %{?libpfm_config} \
 --with-static-lib=yes --with-shared-lib=yes --with-shlib \
---with-components="appio coretemp example lmsensors lustre mx net rapl stealtime"
+--with-components="appio coretemp example lmsensors lustre micpower mx net rapl"
 #components currently left out because of build configure/build issues
-#--with-components="appio cuda vmware"
+#--with-components="appio cuda host_micpower nvml perf_event perf_event_uncore stealtime vmware"
 
 pushd components
 #pushd cuda; ./configure; popd
+#pushd host_micpower; ./configure; popd
 pushd infiniband; %configure; popd
 pushd lmsensors; \
  %configure --with-sensors_incdir=/usr/include/sensors \
@@ -147,6 +137,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Wed Aug 07 2013 William Cohen <wcohen@redhat.com> - 5.2.0-1
+- Rebase to 5.2.0
+
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 5.1.1-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
