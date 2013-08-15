@@ -2,7 +2,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.2.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
@@ -69,9 +69,10 @@ autoconf
 %configure --with-perf-events \
 %{?libpfm_config} \
 --with-static-lib=yes --with-shared-lib=yes --with-shlib \
---with-components="appio coretemp example lmsensors lustre micpower mx net rapl"
+--with-components="appio coretemp example infiniband lmsensors lustre micpower mx net rapl stealtime"
+# implicit enabled components: perf_event perf_event_uncore
 #components currently left out because of build configure/build issues
-#--with-components="appio cuda host_micpower nvml perf_event perf_event_uncore stealtime vmware"
+# --with-components="bgpm coretemp_freebsd cuda host_micpower nvml vmware"
 
 pushd components
 #pushd cuda; ./configure; popd
@@ -137,6 +138,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Wed Aug 14 2013 William Cohen <wcohen@redhat.com> - 5.2.0-2
+- Enable infiniband and stealtime components.
+
 * Wed Aug 07 2013 William Cohen <wcohen@redhat.com> - 5.2.0-1
 - Rebase to 5.2.0
 
