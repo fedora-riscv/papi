@@ -2,7 +2,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.2.0
-Release: 2%{?dist}
+Release: 2.37.g5c1405a%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
@@ -138,6 +138,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Mon Nov 04 2013 Lukas Berk <lberk@redhat.com> - 5.2.0-2.37.g5c1405a
+- Automated weekly rawhide release
+
 * Wed Aug 14 2013 William Cohen <wcohen@redhat.com> - 5.2.0-2
 - Enable infiniband and stealtime components.
 
