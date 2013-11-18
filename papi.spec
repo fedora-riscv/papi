@@ -2,11 +2,11 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.2.0
-Release: 2.37.g5c1405a%{?dist}
+Release: 2.63.g91a6fa5%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
-Source0: %{name}-%{version}-2.37.g5c1405a.tar.gz
+Source0: %{name}-%{version}-2.63.g91a6fa5.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: autoconf
 BuildRequires: doxygen
@@ -138,6 +138,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Mon Nov 18 2013 Lukas Berk <lberk@redhat.com> - 5.2.0-2.63.g91a6fa5
+- Automated weekly rawhide release
+
 * Mon Nov 04 2013 Lukas Berk <lberk@redhat.com> - 5.2.0-2.37.g5c1405a
 - Automated weekly rawhide release
 
