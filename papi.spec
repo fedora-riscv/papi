@@ -2,12 +2,13 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.2.0
-Release: 2%{?dist}
+Release: 4%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
 Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
+Patch100: papi-intel.patch
 BuildRequires: autoconf
 BuildRequires: doxygen
 BuildRequires: ncurses-devel
@@ -57,6 +58,7 @@ the PAPI user-space libraries and interfaces.
 
 %prep
 %setup -q
+%patch100 -p1
 
 %build
 %if %{without bundled_libpfm}
@@ -138,6 +140,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Mon Jan 13 2014 William Cohen <wcohen@redhat.com> - 5.2.0-4
+- Add presets for Haswell and Ivy Bridge.
+
 * Wed Aug 14 2013 William Cohen <wcohen@redhat.com> - 5.2.0-2
 - Enable infiniband and stealtime components.
 
