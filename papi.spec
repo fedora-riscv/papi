@@ -2,7 +2,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.2.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
@@ -17,8 +17,8 @@ BuildRequires: kernel-headers >= 2.6.32
 BuildRequires: chrpath
 BuildRequires: lm_sensors-devel
 %if %{without bundled_libpfm}
-BuildRequires: libpfm-devel >= 4.3.0
-BuildRequires: libpfm-static >= 4.3.0
+BuildRequires: libpfm-devel >= 4.4.0-5
+BuildRequires: libpfm-static >= 4.4.0-5
 %endif
 # Following required for net component
 BuildRequires: net-tools
@@ -140,6 +140,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Tue Jan 14 2014 William Cohen <wcohen@redhat.com> - 5.2.0-5
+- Add presets for Intel Silvermont.
+
 * Mon Jan 13 2014 William Cohen <wcohen@redhat.com> - 5.2.0-4
 - Add presets for Haswell and Ivy Bridge.
 
