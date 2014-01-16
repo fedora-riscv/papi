@@ -1,12 +1,12 @@
 %bcond_with bundled_libpfm
 Summary: Performance Application Programming Interface
 Name: papi
-Version: 5.2.0
-Release: 3%{?dist}
+Version: 5.3.0
+Release: 1%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
-Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz 
+Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: autoconf
 BuildRequires: doxygen
@@ -16,8 +16,8 @@ BuildRequires: kernel-headers >= 2.6.32
 BuildRequires: chrpath
 BuildRequires: lm_sensors-devel
 %if %{without bundled_libpfm}
-BuildRequires: libpfm-devel >= 4.3.0
-BuildRequires: libpfm-static >= 4.3.0
+BuildRequires: libpfm-devel >= 4.4.0-5
+BuildRequires: libpfm-static >= 4.4.0-5
 %endif
 # Following required for net component
 BuildRequires: net-tools
@@ -138,20 +138,14 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
-* Thu Nov 28 2013 Lukas Berk <lberk@redhat.com> - 5.2.0.3
-- Revert back to papi 5.2 release
+* Thu Jan 16 2014 William Cohen <wcohen@redhat.com> - 5.3.0-1
+- Rebase to 5.3.0.
 
-* Mon Nov 25 2013 Lukas Berk <lberk@redhat.com> - 5.2.0-2.1.gff3e15d
-- Automated weekly rawhide release
+* Tue Jan 14 2014 William Cohen <wcohen@redhat.com> - 5.2.0-5
+- Add presets for Intel Silvermont.
 
-* Mon Nov 18 2013 Lukas Berk <lberk@redhat.com> - 5.2.0-2.63.g91a6fa5
-- Automated weekly rawhide release
-
-* Mon Nov 04 2013 Lukas Berk <lberk@redhat.com> - 5.2.0-2.37.g5c1405a
-- Automated weekly rawhide release
-
-* Mon Nov 04 2013 Lukas Berk <lberk@redhat.com> - 5.2.0-2.37.g5c1405a
-- Automated weekly rawhide release
+* Mon Jan 13 2014 William Cohen <wcohen@redhat.com> - 5.2.0-4
+- Add presets for Haswell and Ivy Bridge.
 
 * Wed Aug 14 2013 William Cohen <wcohen@redhat.com> - 5.2.0-2
 - Enable infiniband and stealtime components.
