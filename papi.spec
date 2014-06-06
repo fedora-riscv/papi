@@ -2,7 +2,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.3.0
-Release: 1.16.ga7f6159%{?dist}
+Release: 2.16.ga7f6159%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
@@ -138,6 +138,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Fri Jun 06 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 5.3.0-2.16.ga7f6159
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
 * Fri Jan 17 2014 Lukas Berk <lberk@redhat.com> - 5.3.0-1.16.ga7f6159
 - Automated weekly rawhide release
 
