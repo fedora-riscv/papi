@@ -1,12 +1,12 @@
 %bcond_with bundled_libpfm
 Summary: Performance Application Programming Interface
 Name: papi
-Version: 5.3.0
-Release: 2.16.ga7f6159%{?dist}
+Version: 5.3.2
+Release: 1%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
-Source0: %{name}-%{version}-1.16.ga7f6159.tar.gz
+Source0: %{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: autoconf
 BuildRequires: doxygen
@@ -138,6 +138,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Mon Aug 4 2014 William Cohen <wcohen@redhat.com> - 5.3.2-1
+- Rebase to 5.3.2.
+
 * Fri Jun 06 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 5.3.0-2.16.ga7f6159
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
 
