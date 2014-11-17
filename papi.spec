@@ -1,12 +1,12 @@
 %bcond_with bundled_libpfm
 Summary: Performance Application Programming Interface
 Name: papi
-Version: 5.3.2
-Release: 2%{?dist}
+Version: 5.4.0
+Release: 1%{?dist}
 License: BSD
 Group: Development/System
 URL: http://icl.cs.utk.edu/papi/
-Source0: %{name}-%{version}.tar.gz
+Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: autoconf
 BuildRequires: doxygen
@@ -77,7 +77,7 @@ autoconf
 pushd components
 #pushd cuda; ./configure; popd
 #pushd host_micpower; ./configure; popd
-pushd infiniband; %configure; popd
+pushd infiniband_umad; %configure; popd
 pushd lmsensors; \
  %configure --with-sensors_incdir=/usr/include/sensors \
  --with-sensors_libdir=%{_libdir}; \
@@ -138,6 +138,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Mon Nov 17 2014 William Cohen <wcohen@redhat.com> - 5.4.0-1
+- Rebase to papi-5.4.0.
+
 * Sun Aug 17 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 5.3.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
