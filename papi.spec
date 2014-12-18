@@ -2,9 +2,10 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.4.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD
 Group: Development/System
+Requires: papi-libs = %{version}-%{release}
 URL: http://icl.cs.utk.edu/papi/
 Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -29,6 +30,13 @@ ExcludeArch: s390 s390x
 %description
 PAPI provides a programmer interface to monitor the performance of
 running programs.
+
+%package libs
+Summary: Libraries for PAPI clients
+Group: Development/System
+%description libs
+This package contains the run-time libraries for any application that wishes
+to use PAPI.
 
 %package devel
 Summary: Header files for the compiling programs with PAPI
@@ -102,19 +110,24 @@ make DESTDIR=$RPM_BUILD_ROOT LDCONFIG=/bin/true install-all
 
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/*.so*
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
 %{_bindir}/*
-%{_libdir}/*.so.*
 %dir /usr/share/papi
 /usr/share/papi/papi_events.csv
 %doc INSTALL.txt README LICENSE.txt RELEASENOTES.txt
 %doc %{_mandir}/man1/*
+
+%post libs -p /sbin/ldconfig
+%postun libs -p /sbin/ldconfig
+
+%files libs
+%defattr(-,root,root,-)
+%{_libdir}/*.so.*
+%doc INSTALL.txt README LICENSE.txt RELEASENOTES.txt
 
 %files devel
 %defattr(-,root,root,-)
@@ -138,6 +151,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Thu Dec 18 2014 William Cohen <wcohen@redhat.com> - 5.4.0-2
+- Split out papi-libs as separate subpackage. (#1172875)
+
 * Mon Nov 17 2014 William Cohen <wcohen@redhat.com> - 5.4.0-1
 - Rebase to papi-5.4.0.
 
