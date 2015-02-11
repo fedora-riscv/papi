@@ -2,7 +2,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.4.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: BSD
 Group: Development/System
 Requires: papi-libs = %{version}-%{release}
@@ -151,6 +151,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Wed Feb 11 2015 William Cohen <wcohen@redhat.com> - 5.4.0-3
+- Bump version and rebuild.
+
 * Thu Dec 18 2014 William Cohen <wcohen@redhat.com> - 5.4.0-2
 - Split out papi-libs as separate subpackage. (#1172875)
 
