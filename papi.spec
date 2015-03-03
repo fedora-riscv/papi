@@ -1,8 +1,8 @@
 %bcond_with bundled_libpfm
 Summary: Performance Application Programming Interface
 Name: papi
-Version: 5.4.0
-Release: 3%{?dist}
+Version: 5.4.1
+Release: 1%{?dist}
 License: BSD
 Group: Development/System
 Requires: papi-libs = %{version}-%{release}
@@ -42,6 +42,7 @@ to use PAPI.
 Summary: Header files for the compiling programs with PAPI
 Group: Development/System
 Requires: papi = %{version}-%{release}
+Requires: pkgconfig
 %description devel
 PAPI-devel includes the C header files that specify the PAPI user-space
 libraries and interfaces. This is required for rebuilding any program
@@ -136,6 +137,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/perfmon/*.h
 %endif
 %{_libdir}/*.so
+%{_libdir}/pkgconfig/papi*.pc
 %doc %{_mandir}/man3/*
 
 %files testsuite
@@ -151,6 +153,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Tue Mar 3 2015 William Cohen <wcohen@redhat.com> - 5.4.1-1
+- Rebase to papi-5.4.1.
+
 * Wed Feb 11 2015 William Cohen <wcohen@redhat.com> - 5.4.0-3
 - Bump version and rebuild.
 
