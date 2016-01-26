@@ -1,8 +1,8 @@
 %bcond_with bundled_libpfm
 Summary: Performance Application Programming Interface
 Name: papi
-Version: 5.4.1
-Release: 3%{?dist}
+Version: 5.4.3
+Release: 1%{?dist}
 License: BSD
 Group: Development/System
 Requires: papi-libs = %{version}-%{release}
@@ -115,7 +115,6 @@ chrpath --delete $RPM_BUILD_ROOT%{_libdir}/*.so*
 rm -rf $RPM_BUILD_ROOT
 
 %files
-%defattr(-,root,root,-)
 %{_bindir}/*
 %dir /usr/share/papi
 /usr/share/papi/papi_events.csv
@@ -126,12 +125,10 @@ rm -rf $RPM_BUILD_ROOT
 %postun libs -p /sbin/ldconfig
 
 %files libs
-%defattr(-,root,root,-)
 %{_libdir}/*.so.*
 %doc INSTALL.txt README LICENSE.txt RELEASENOTES.txt
 
 %files devel
-%defattr(-,root,root,-)
 %{_includedir}/*.h
 %if %{with bundled_libpfm}
 %{_includedir}/perfmon/*.h
@@ -141,7 +138,6 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_mandir}/man3/*
 
 %files testsuite
-%defattr(-,root,root,-)
 /usr/share/papi/run_tests*
 /usr/share/papi/ctests
 /usr/share/papi/ftests
@@ -149,10 +145,12 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/papi/testlib
 
 %files static
-%defattr(-,root,root,-)
 %{_libdir}/*.a
 
 %changelog
+* Tue Jan 26 2016 William Cohen <wcohen@redhat.com> - 5.4.3-1
+- Rebase to papi-5.4.3.
+
 * Thu Jun 18 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 5.4.1-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
 
