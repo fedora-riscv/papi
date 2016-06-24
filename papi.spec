@@ -24,6 +24,7 @@ BuildRequires: libpfm-static >= 4.6.0-1
 BuildRequires: net-tools
 # Following required for inifiband component
 BuildRequires: libibmad-devel
+BuildRequires: perl-generators
 #Right now libpfm does not know anything about s390 and will fail
 ExcludeArch: s390 s390x
 
