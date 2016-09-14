@@ -1,8 +1,8 @@
 %bcond_with bundled_libpfm
 Summary: Performance Application Programming Interface
 Name: papi
-Version: 5.4.3
-Release: 2%{?dist}
+Version: 5.5.0
+Release: 1%{?dist}
 License: BSD
 Group: Development/System
 Requires: papi-libs = %{version}-%{release}
@@ -149,6 +149,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Wed Sep 14 2016 Fedora Release Engineering <releng@fedoraproject.org> - 5.5.0-1
+- Rebase to papi-5.5.0.
+
 * Thu Feb 04 2016 Fedora Release Engineering <releng@fedoraproject.org> - 5.4.3-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 
