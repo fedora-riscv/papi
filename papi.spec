@@ -1,7 +1,7 @@
 %bcond_with bundled_libpfm
 Summary: Performance Application Programming Interface
 Name: papi
-Version: 5.5.0
+Version: 5.5.1
 Release: 1%{?dist}
 License: BSD
 Group: Development/System
@@ -149,6 +149,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Fri Nov 18 2016 Fedora Release Engineering <releng@fedoraproject.org> - 5.5.1-1
+- Rebase to papi-5.5.1.
+
 * Wed Sep 14 2016 Fedora Release Engineering <releng@fedoraproject.org> - 5.5.0-1
 - Rebase to papi-5.5.0.
 
