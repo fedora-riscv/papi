@@ -2,7 +2,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.5.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD
 Group: Development/System
 Requires: papi-libs = %{version}-%{release}
@@ -149,6 +149,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Thu Feb 2 2017 William Cohen <wcohen@redhat.com> - 5.5.1-2
+- Bump version and rebuild due to new libgfortan.so version.
+
 * Fri Nov 18 2016 Fedora Release Engineering <releng@fedoraproject.org> - 5.5.1-1
 - Rebase to papi-5.5.1.
 
