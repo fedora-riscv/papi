@@ -2,7 +2,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.5.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: BSD
 Group: Development/System
 Requires: papi-libs = %{version}-%{release}
@@ -22,8 +22,10 @@ BuildRequires: libpfm-static >= 4.6.0-1
 %endif
 # Following required for net component
 BuildRequires: net-tools
+%ifnarch %{arm}
 # Following required for inifiband component
 BuildRequires: libibmad-devel
+%endif
 BuildRequires: perl-generators
 #Right now libpfm does not know anything about s390 and will fail
 ExcludeArch: s390 s390x
@@ -87,7 +89,9 @@ autoconf
 pushd components
 #pushd cuda; ./configure; popd
 #pushd host_micpower; ./configure; popd
+%ifnarch %{arm}
 pushd infiniband_umad; %configure; popd
+%endif
 pushd lmsensors; \
  %configure --with-sensors_incdir=/usr/include/sensors \
  --with-sensors_libdir=%{_libdir}; \
@@ -149,6 +153,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Mon Aug 28 2017 Honggang LI <honli@redhat.com> - 5.5.1-6
+- Disable RDMA support on ARM32
+
 * Thu Aug 03 2017 Fedora Release Engineering <releng@fedoraproject.org> - 5.5.1-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
 
