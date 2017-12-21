@@ -1,8 +1,8 @@
 %bcond_with bundled_libpfm
 Summary: Performance Application Programming Interface
 Name: papi
-Version: 5.5.1
-Release: 6%{?dist}
+Version: 5.6.0
+Release: 1%{?dist}
 License: BSD
 Group: Development/System
 Requires: papi-libs = %{version}-%{release}
@@ -146,6 +146,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/papi/run_tests*
 /usr/share/papi/ctests
 /usr/share/papi/ftests
+/usr/share/papi/validation_tests
 /usr/share/papi/components
 /usr/share/papi/testlib
 
@@ -153,6 +154,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Thu Dec 21 2017 William Cohen <wcohen@redhat.com> - 5.6.0-1
+- Rebase to papi-5.6.0.
+
 * Mon Aug 28 2017 Honggang LI <honli@redhat.com> - 5.5.1-6
 - Disable RDMA support on ARM32
 
