@@ -1,8 +1,14 @@
 %bcond_with bundled_libpfm
+# rdma is not available
+%ifarch %{arm}
+%{!?with_rdma: %global with_rdma 0}
+%else
+%{!?with_rdma: %global with_rdma 1}
+%endif
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.6.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD
 Group: Development/System
 Requires: papi-libs = %{version}-%{release}
@@ -22,9 +28,10 @@ BuildRequires: libpfm-static >= 4.6.0-1
 %endif
 # Following required for net component
 BuildRequires: net-tools
-%ifnarch %{arm}
+%if  %{with_rdma}
 # Following required for inifiband component
-BuildRequires: libibmad-devel
+BuildRequires: rdma-core-devel
+BuildRequires: infiniband-diags-devel
 %endif
 BuildRequires: perl-generators
 #Right now libpfm does not know anything about s390 and will fail
@@ -89,7 +96,7 @@ autoconf
 pushd components
 #pushd cuda; ./configure; popd
 #pushd host_micpower; ./configure; popd
-%ifnarch %{arm}
+%if  %{with_rdma}
 pushd infiniband_umad; %configure; popd
 %endif
 pushd lmsensors; \
@@ -154,6 +161,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Thu Dec 21 2017 William Cohen <wcohen@redhat.com> - 5.6.0-2
+- Correct infiniband buildrequires.
+
 * Thu Dec 21 2017 William Cohen <wcohen@redhat.com> - 5.6.0-1
 - Rebase to papi-5.6.0.
 
