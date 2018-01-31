@@ -8,7 +8,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.6.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: BSD
 Group: Development/System
 Requires: papi-libs = %{version}-%{release}
@@ -161,6 +161,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Wed Jan 31 2018 William Cohen <wcohen@redhat.com> - 5.6.0-3
+- Bump and rebuild.
+
 * Thu Dec 21 2017 William Cohen <wcohen@redhat.com> - 5.6.0-2
 - Correct infiniband buildrequires.
 
