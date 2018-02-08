@@ -8,7 +8,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.6.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: BSD
 Group: Development/System
 Requires: papi-libs = %{version}-%{release}
@@ -161,6 +161,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Thu Feb 08 2018 Fedora Release Engineering <releng@fedoraproject.org> - 5.6.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
+
 * Wed Jan 31 2018 William Cohen <wcohen@redhat.com> - 5.6.0-3
 - Bump and rebuild.
 
