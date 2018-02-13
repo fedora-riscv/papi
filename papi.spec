@@ -14,7 +14,6 @@ Group: Development/System
 Requires: papi-libs = %{version}-%{release}
 URL: http://icl.cs.utk.edu/papi/
 Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: autoconf
 BuildRequires: doxygen
 BuildRequires: ncurses-devel
