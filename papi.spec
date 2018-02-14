@@ -122,9 +122,6 @@ make DESTDIR=$RPM_BUILD_ROOT LDCONFIG=/bin/true install-all
 
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/*.so*
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 %files
 %{_bindir}/*
 %dir /usr/share/papi
