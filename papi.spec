@@ -8,12 +8,13 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.6.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: BSD
 Group: Development/System
 Requires: papi-libs = %{version}-%{release}
 URL: http://icl.cs.utk.edu/papi/
 Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
+Patch1: papi-ldflags.patch
 BuildRequires: autoconf
 BuildRequires: doxygen
 BuildRequires: ncurses-devel
@@ -75,6 +76,7 @@ the PAPI user-space libraries and interfaces.
 
 %prep
 %setup -q
+%patch1 -p1 -b .ldflags
 
 %build
 %if %{without bundled_libpfm}
@@ -157,6 +159,9 @@ chrpath --delete $RPM_BUILD_ROOT%{_libdir}/*.so*
 %{_libdir}/*.a
 
 %changelog
+* Mon Apr 30 2018 William Cohen <wcohen@redhat.com> - 5.6.0-5
+- Include various LDFLAGS/CFLAGS.
+
 * Thu Feb 08 2018 Fedora Release Engineering <releng@fedoraproject.org> - 5.6.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
 
