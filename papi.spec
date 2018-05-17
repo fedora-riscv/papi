@@ -8,7 +8,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.6.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: BSD
 Group: Development/System
 Requires: papi-libs = %{version}-%{release}
@@ -88,7 +88,7 @@ cd src
 autoconf
 %configure --with-perf-events \
 %{?libpfm_config} \
---with-static-lib=yes --with-shared-lib=yes --with-shlib \
+--with-static-lib=yes --with-shared-lib=yes --with-shlib --with-shlib-tools \
 --with-components="appio coretemp example infiniband lmsensors lustre micpower mx net rapl stealtime"
 # implicit enabled components: perf_event perf_event_uncore
 #components currently left out because of build configure/build issues
@@ -159,6 +159,9 @@ chrpath --delete $RPM_BUILD_ROOT%{_libdir}/*.so*
 %{_libdir}/*.a
 
 %changelog
+* Thu May 17 2018 William Cohen <wcohen@redhat.com> - 5.6.0-6
+- Dynamically link utilities and tests to papi libraries.
+
 * Mon Apr 30 2018 William Cohen <wcohen@redhat.com> - 5.6.0-5
 - Include various LDFLAGS/CFLAGS.
 
