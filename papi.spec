@@ -8,7 +8,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.6.0
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: BSD
 Group: Development/System
 Requires: papi-libs = %{version}-%{release}
@@ -53,6 +53,7 @@ to use PAPI.
 Summary: Header files for the compiling programs with PAPI
 Group: Development/System
 Requires: papi = %{version}-%{release}
+Requires: papi-libs = %{version}-%{release}
 Requires: pkgconfig
 %description devel
 PAPI-devel includes the C header files that specify the PAPI user-space
@@ -63,8 +64,9 @@ that uses PAPI.
 Summary: Set of tests for checking PAPI functionality
 Group: Development/System
 Requires: papi = %{version}-%{release}
+Requires: papi-libs = %{version}-%{release}
 %description testsuite
-PAPI-testuiste includes compiled versions of papi tests to ensure
+PAPI-testsuite includes compiled versions of papi tests to ensure
 that PAPI functions on particular hardware.
 
 %package static
@@ -161,6 +163,10 @@ chrpath --delete $RPM_BUILD_ROOT%{_libdir}/*.so*
 %{_libdir}/*.a
 
 %changelog
+* Mon Jan 7 2019 William Cohen <wcohen@redhat.com> - 5.6.0-9
+- Correct typo in papi-testsuite description.
+- Add papi-libs for papi-testsuite and papi-devel.
+
 * Fri Nov 2 2018 Fedora Release Engineering <releng@fedoraproject.org> - 5.6.0-8
 - Pull in patch to avoid division-by-0.
 
