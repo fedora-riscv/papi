@@ -10,7 +10,6 @@ Name: papi
 Version: 5.6.0
 Release: 9%{?dist}
 License: BSD
-Group: Development/System
 Requires: papi-libs = %{version}-%{release}
 URL: http://icl.cs.utk.edu/papi/
 Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
@@ -44,14 +43,12 @@ running programs.
 
 %package libs
 Summary: Libraries for PAPI clients
-Group: Development/System
 %description libs
 This package contains the run-time libraries for any application that wishes
 to use PAPI.
 
 %package devel
 Summary: Header files for the compiling programs with PAPI
-Group: Development/System
 Requires: papi = %{version}-%{release}
 Requires: papi-libs = %{version}-%{release}
 Requires: pkgconfig
@@ -62,7 +59,6 @@ that uses PAPI.
 
 %package testsuite
 Summary: Set of tests for checking PAPI functionality
-Group: Development/System
 Requires: papi = %{version}-%{release}
 Requires: papi-libs = %{version}-%{release}
 %description testsuite
@@ -71,7 +67,6 @@ that PAPI functions on particular hardware.
 
 %package static
 Summary: Static libraries for the compiling programs with PAPI
-Group: Development/System
 Requires: papi = %{version}-%{release}
 %description static
 PAPI-static includes the static versions of the library files for
