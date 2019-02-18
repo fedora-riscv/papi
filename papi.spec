@@ -7,14 +7,12 @@
 %endif
 Summary: Performance Application Programming Interface
 Name: papi
-Version: 5.6.0
-Release: 10%{?dist}
+Version: 5.7.0
+Release: 1%{?dist}
 License: BSD
 Requires: papi-libs = %{version}-%{release}
 URL: http://icl.cs.utk.edu/papi/
 Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
-Patch1: papi-ldflags.patch
-Patch2: papi-divzero.patch
 BuildRequires: autoconf
 BuildRequires: doxygen
 BuildRequires: ncurses-devel
@@ -74,8 +72,6 @@ the PAPI user-space libraries and interfaces.
 
 %prep
 %setup -q
-%patch1 -p1 -b .ldflags
-%patch2 -p1 -b .divzero
 
 %build
 %if %{without bundled_libpfm}
@@ -157,6 +153,9 @@ chrpath --delete $RPM_BUILD_ROOT%{_libdir}/*.so*
 %{_libdir}/*.a
 
 %changelog
+* Mon Feb 18 2019 William Cohen <wcohen@redhat.com> - 5.7.0-1
+- Rebase to papi-5.7.0.
+
 * Fri Feb 01 2019 Fedora Release Engineering <releng@fedoraproject.org> - 5.6.0-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
 
