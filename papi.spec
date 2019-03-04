@@ -8,7 +8,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 5.7.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD
 Requires: papi-libs = %{version}-%{release}
 URL: http://icl.cs.utk.edu/papi/
@@ -153,6 +153,9 @@ chrpath --delete $RPM_BUILD_ROOT%{_libdir}/*.so*
 %{_libdir}/*.a
 
 %changelog
+* Mon Mar 04 2019 William Cohen <wcohen@redhat.com> - 5.7.0-2
+- Rebase to official papi-5.7.0.
+
 * Mon Feb 18 2019 William Cohen <wcohen@redhat.com> - 5.7.0-1
 - Rebase to papi-5.7.0.
 
