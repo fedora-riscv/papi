@@ -5,14 +5,16 @@
 %else
 %{!?with_rdma: %global with_rdma 1}
 %endif
+%{!?with_pcp: %global with_pcp 1}
 Summary: Performance Application Programming Interface
 Name: papi
-Version: 5.7.0
-Release: 4%{?dist}
+Version: 6.0.0
+Release: 1%{?dist}
 License: BSD
 Requires: papi-libs = %{version}-%{release}
 URL: http://icl.cs.utk.edu/papi/
 Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
+Patch1: papi-python3.patch
 BuildRequires: autoconf
 BuildRequires: doxygen
 BuildRequires: ncurses-devel
@@ -30,6 +32,9 @@ BuildRequires: net-tools
 # Following required for inifiband component
 BuildRequires: rdma-core-devel
 BuildRequires: infiniband-diags-devel
+%endif
+%if %{with_pcp}
+BuildRequires: pcp-libs-devel
 %endif
 BuildRequires: perl-generators
 #Right now libpfm does not know anything about s390 and will fail
@@ -72,6 +77,7 @@ the PAPI user-space libraries and interfaces.
 
 %prep
 %setup -q
+%patch1 -p1 -b .python3
 
 %build
 %if %{without bundled_libpfm}
@@ -79,28 +85,29 @@ the PAPI user-space libraries and interfaces.
 %global libpfm_config --with-pfm-incdir=%{_includedir} --with-pfm-libdir=%{_libdir}
 %endif
 
+# set up environment variable for the various components
+# cuda
+# host_micpower
+%if  %{with_rdma}
+  export PAPI_INFINIBAND_UMAD_ROOT=/usr
+%endif
+# lmsensors
+export PAPI_LMSENSORS_ROOT=/usr
+#pushd vmware; ./configure; popd
+%if %{with_pcp}
+%global pcp_enable pcp
+export PAPI_PCP_ROOT=/usr
+%endif
+
 cd src
 autoconf
 %configure --with-perf-events \
 %{?libpfm_config} \
 --with-static-lib=yes --with-shared-lib=yes --with-shlib --with-shlib-tools \
---with-components="appio coretemp example infiniband lmsensors lustre micpower mx net rapl stealtime"
+--with-components="appio coretemp example infiniband lmsensors lustre micpower mx net %{?pcp_enable} rapl sde stealtime"
 # implicit enabled components: perf_event perf_event_uncore
 #components currently left out because of build configure/build issues
 # --with-components="bgpm coretemp_freebsd cuda host_micpower nvml vmware"
-
-pushd components
-#pushd cuda; ./configure; popd
-#pushd host_micpower; ./configure; popd
-%if  %{with_rdma}
-pushd infiniband_umad; %configure; popd
-%endif
-pushd lmsensors; \
- %configure --with-sensors_incdir=/usr/include/sensors \
- --with-sensors_libdir=%{_libdir}; \
- popd
-#pushd vmware; ./configure; popd
-popd
 
 #DBG workaround to make sure libpfm just uses the normal CFLAGS
 DBG="" make %{?_smp_mflags}
@@ -123,14 +130,14 @@ chrpath --delete $RPM_BUILD_ROOT%{_libdir}/*.so*
 %{_bindir}/*
 %dir /usr/share/papi
 /usr/share/papi/papi_events.csv
-%doc INSTALL.txt README LICENSE.txt RELEASENOTES.txt
+%doc INSTALL.txt README.md LICENSE.txt RELEASENOTES.txt
 %doc %{_mandir}/man1/*
 
 %ldconfig_scriptlets libs
 
 %files libs
 %{_libdir}/*.so.*
-%doc INSTALL.txt README LICENSE.txt RELEASENOTES.txt
+%doc INSTALL.txt README.md LICENSE.txt RELEASENOTES.txt
 
 %files devel
 %{_includedir}/*.h
@@ -153,6 +160,9 @@ chrpath --delete $RPM_BUILD_ROOT%{_libdir}/*.so*
 %{_libdir}/*.a
 
 %changelog
+* Wed Mar 04 2020 William Cohen <wcohen@redhat.com> - 6.0.0-1
+- Rebase to official papi-6.0.0.
+
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 5.7.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
