@@ -9,7 +9,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 6.0.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD
 Requires: papi-libs = %{version}-%{release}
 URL: http://icl.cs.utk.edu/papi/
@@ -80,6 +80,12 @@ the PAPI user-space libraries and interfaces.
 %patch1 -p1 -b .python3
 
 %build
+# This package fails to build with LTO due to undefined symbols.  LTO
+# was disabled in OpenSuSE as well, but with no real explanation why
+# beyond the undefined symbols.  It really shold be investigated further.
+# Disable LTO
+%define _lto_cflags %{nil}
+
 %if %{without bundled_libpfm}
 # Build our own copy of libpfm.
 %global libpfm_config --with-pfm-incdir=%{_includedir} --with-pfm-libdir=%{_libdir}
@@ -160,6 +166,9 @@ chrpath --delete $RPM_BUILD_ROOT%{_libdir}/*.so*
 %{_libdir}/*.a
 
 %changelog
+* Wed Jul 01 2020 Jeff Law <law@redhat.com> - 6.0.0-2
+- Disable LTO
+
 * Wed Mar 04 2020 William Cohen <wcohen@redhat.com> - 6.0.0-1
 - Rebase to official papi-6.0.0.
 
