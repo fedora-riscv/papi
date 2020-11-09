@@ -1,0 +1,34 @@
+commit 9a44d82928ed17ba2ff21eb88b89c5829d0ea30e
+Author: Steve Kaufmann <steven.kaufmann@hpe.com>
+Date:   Wed Jun 24 14:08:08 2020 -0400
+
+    Added PAPI preset support for Fujitsu A64FX.
+    
+    Signed-off-by: Heike Jagode <jagode@icl.utk.edu>
+
+diff --git a/src/papi_events.csv b/src/papi_events.csv
+index 8e96adfbd..1b5c15542 100644
+--- a/src/papi_events.csv
++++ b/src/papi_events.csv
+@@ -1877,6 +1877,21 @@ PRESET,PAPI_L2_DCR,NOT_DERIVED,L2D_CACHE_RD
+ PRESET,PAPI_L2_DCW,NOT_DERIVED,L2D_CACHE_WR
+ PRESET,PAPI_L2_LDM,NOT_DERIVED,L2D_CACHE_REFILL_RD
+ 
++#########################
++# ARM Fujitsu A64FX     #
++#########################
++CPU,arm_a64fx
++#
++PRESET,PAPI_TOT_INS,NOT_DERIVED,INST_RETIRED
++PRESET,PAPI_TOT_CYC,NOT_DERIVED,CPU_CYCLES
++PRESET,PAPI_FP_INS,NOT_DERIVED,VFP_SPEC
++PRESET,PAPI_VEC_INS,NOT_DERIVED,ASE_SPEC
++PRESET,PAPI_L1_DCM,NOT_DERIVED,L1D_CACHE_REFILL
++PRESET,PAPI_L1_ICA,NOT_DERIVED,L1I_CACHE
++PRESET,PAPI_L1_ICM,NOT_DERIVED,L1I_CACHE_REFILL
++PRESET,PAPI_L2_DCH,NOT_DERIVED,L2D_CACHE
++PRESET,PAPI_L2_DCM,NOT_DERIVED,L2D_CACHE_REFILL
++
+ #
+ CPU,mips_74k
+ #
