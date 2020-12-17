@@ -9,13 +9,14 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 6.0.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: BSD
 Requires: papi-libs = %{version}-%{release}
 URL: http://icl.cs.utk.edu/papi/
 Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
 Patch1: papi-python3.patch
 Patch2: papi-a64fx.patch
+Patch3: papi-no-iozone.patch
 BuildRequires: autoconf
 BuildRequires: doxygen
 BuildRequires: ncurses-devel
@@ -80,6 +81,7 @@ the PAPI user-space libraries and interfaces.
 %setup -q
 %patch1 -p1 -b .python3
 %patch2 -p1 -b .a64fx
+%patch3 -p1
 
 %build
 # This package fails to build with LTO due to undefined symbols.  LTO
@@ -168,6 +170,9 @@ chrpath --delete $RPM_BUILD_ROOT%{_libdir}/*.so*
 %{_libdir}/*.a
 
 %changelog
+* Thu Dec 17 2020 William Cohen <wcohen@redhat.com> - 6.0.0-5
+- Remove iozone source code. (#1901077)
+
 * Mon Nov 09 2020 William Cohen <wcohen@redhat.com> - 6.0.0-4
 - Add Fujitsu A64FX presets.
 
