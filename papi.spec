@@ -17,6 +17,7 @@ Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
 Patch1: papi-python3.patch
 Patch2: papi-a64fx.patch
 Patch3: papi-no-iozone.patch
+BuildRequires: make
 BuildRequires: autoconf
 BuildRequires: doxygen
 BuildRequires: ncurses-devel
