@@ -1,3 +1,5 @@
+# Default to no static libraries
+%{!?with_static: %global with_static 0}
 %bcond_with bundled_libpfm
 # rdma is not available
 %ifarch %{arm}
@@ -9,7 +11,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 6.0.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: BSD
 Requires: papi-libs = %{version}-%{release}
 URL: http://icl.cs.utk.edu/papi/
@@ -17,6 +19,8 @@ Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
 Patch1: papi-python3.patch
 Patch2: papi-a64fx.patch
 Patch3: papi-no-iozone.patch
+Patch4: papi-config.patch
+Patch5: papi-nostatic.patch
 BuildRequires: make
 BuildRequires: autoconf
 BuildRequires: doxygen
@@ -27,7 +31,9 @@ BuildRequires: chrpath
 BuildRequires: lm_sensors-devel
 %if %{without bundled_libpfm}
 BuildRequires: libpfm-devel >= 4.6.0-1
+%if %{with_static}
 BuildRequires: libpfm-static >= 4.6.0-1
+%endif
 %endif
 # Following required for net component
 BuildRequires: net-tools
@@ -71,18 +77,22 @@ Requires: papi-libs = %{version}-%{release}
 PAPI-testsuite includes compiled versions of papi tests to ensure
 that PAPI functions on particular hardware.
 
+%if %{with_static}
 %package static
 Summary: Static libraries for the compiling programs with PAPI
 Requires: papi = %{version}-%{release}
 %description static
 PAPI-static includes the static versions of the library files for
 the PAPI user-space libraries and interfaces.
+%endif
 
 %prep
 %setup -q
 %patch1 -p1 -b .python3
 %patch2 -p1 -b .a64fx
 %patch3 -p1
+%patch4 -p1
+%patch5 -p1
 
 %build
 # This package fails to build with LTO due to undefined symbols.  LTO
@@ -94,6 +104,12 @@ the PAPI user-space libraries and interfaces.
 %if %{without bundled_libpfm}
 # Build our own copy of libpfm.
 %global libpfm_config --with-pfm-incdir=%{_includedir} --with-pfm-libdir=%{_libdir}
+%endif
+
+%if %{with_static}
+%global static_lib_config --with-static-lib=yes
+%else
+%global static_lib_config --with-static-lib=no
 %endif
 
 # set up environment variable for the various components
@@ -114,8 +130,9 @@ cd src
 autoconf
 %configure --with-perf-events \
 %{?libpfm_config} \
---with-static-lib=yes --with-shared-lib=yes --with-shlib --with-shlib-tools \
---with-components="appio coretemp example infiniband lmsensors lustre micpower mx net %{?pcp_enable} rapl sde stealtime"
+%{?static_lib_config} \
+--with-shared-lib=yes --with-shlib --with-shlib-tools \
+--with-components="appio coretemp example infiniband lmsensors lustre micpower mx net %{?pcp_enable} rapl stealtime"
 # implicit enabled components: perf_event perf_event_uncore
 #components currently left out because of build configure/build issues
 # --with-components="bgpm coretemp_freebsd cuda host_micpower nvml vmware"
@@ -167,10 +184,15 @@ chrpath --delete $RPM_BUILD_ROOT%{_libdir}/*.so*
 /usr/share/papi/components
 /usr/share/papi/testlib
 
+%if %{with_static}
 %files static
 %{_libdir}/*.a
+%endif
 
 %changelog
+* Thu Jan 28 2021 William Cohen <wcohen@redhat.com> - 6.0.0-7
+- By default disable genaration of static libraries.
+
 * Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 6.0.0-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
