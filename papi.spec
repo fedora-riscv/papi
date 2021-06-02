@@ -11,7 +11,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 6.0.0
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: BSD
 Requires: papi-libs = %{version}-%{release}
 URL: http://icl.cs.utk.edu/papi/
@@ -152,7 +152,8 @@ rm -rf $RPM_BUILD_ROOT
 cd src
 make DESTDIR=$RPM_BUILD_ROOT LDCONFIG=/bin/true install-all
 
-chrpath --delete $RPM_BUILD_ROOT%{_libdir}/*.so*
+# Scrub the rpath/runpath from all the binaries.
+find %{buildroot} -type f -executable ! -iname "*.py" ! -iname "*.sh" | xargs chrpath --delete
 
 %files
 %{_bindir}/*
@@ -190,6 +191,9 @@ chrpath --delete $RPM_BUILD_ROOT%{_libdir}/*.so*
 %endif
 
 %changelog
+* Wed Jun 2 2021 William Cohen <wcohen@redhat.com> - 6.0.0-8
+- Scrub rpaths from all executables.
+
 * Thu Jan 28 2021 William Cohen <wcohen@redhat.com> - 6.0.0-7
 - By default disable genaration of static libraries.
 
