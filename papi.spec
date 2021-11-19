@@ -11,7 +11,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 6.0.0
-Release: 8%{?dist}
+Release: 10%{?dist}
 License: BSD
 Requires: papi-libs = %{version}-%{release}
 URL: http://icl.cs.utk.edu/papi/
@@ -21,6 +21,7 @@ Patch2: papi-a64fx.patch
 Patch3: papi-no-iozone.patch
 Patch4: papi-config.patch
 Patch5: papi-nostatic.patch
+Patch6: papi-init_thread.patch
 BuildRequires: make
 BuildRequires: autoconf
 BuildRequires: doxygen
@@ -93,6 +94,7 @@ the PAPI user-space libraries and interfaces.
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+%patch6 -p1 -b .thread
 
 %build
 # This package fails to build with LTO due to undefined symbols.  LTO
@@ -191,6 +193,9 @@ find %{buildroot} -type f -executable ! -iname "*.py" ! -iname "*.sh" | xargs ch
 %endif
 
 %changelog
+* Fri Nov 19 2021 William Cohen <wcohen@redhat.com> - 6.0.0-10
+- Correct initialization for stealtime component.
+
 * Wed Jun 2 2021 William Cohen <wcohen@redhat.com> - 6.0.0-8
 - Scrub rpaths from all executables.
 
