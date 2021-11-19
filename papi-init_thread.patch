@@ -1,0 +1,106 @@
+commit 3625bdbad9fd57d1cdb1e5615854545167d4adcb
+Author: Anthony Castaldo <TonyCastaldo@icl.utk.edu>
+Date:   Wed Aug 26 17:18:29 2020 -0400
+
+    This modifies PAPI_library_init() to initialize components in two classes,
+    separated by the initialization of the papi thread structure.  The first class
+    is those that need no thread structure, currently everything but perf_event and
+    perf_event_uncore. Following the init of the threading structure, we init the
+    second class (perf_event and perf_event_uncore) that DOES need the thread
+    structure to successfully init_component().  This required a change to
+    _papi_hwi_init_global(), to add an argument to distinguish which class it
+    should initialize.
+
+diff --git a/src/papi.c b/src/papi.c
+index 33cc29935..ed75af493 100644
+--- a/src/papi.c
++++ b/src/papi.c
+@@ -1151,7 +1151,23 @@ PAPI_library_init( int version )
+ 	   papi_return( init_retval );
+ 	}
+ 
+-	/* Initialize thread globals, including the main threads  */
++	/* Initialize component globals EXCEPT for perf_event, perf_event_uncore.
++    * To avoid race conditions, these components use the thread local storage
++    * construct initialized by _papi_hwi_init_global_threads(), from within 
++    * their init_component(). So these must have init_component() run AFTER
++    * _papi_hwi_init_global_threads. Other components demand that init threads
++    * run AFTER init_component(), which sets up globals they need.
++    */
++
++	tmp = _papi_hwi_init_global( 0 ); /* Selector 0 to skip perf_event, perf_event_uncore */
++	if ( tmp ) {
++		init_retval = tmp;
++		_papi_hwi_shutdown_global_internal(  );
++		_in_papi_library_init_cnt--;
++		papi_return( init_retval );
++	}
++	
++   /* Initialize thread globals, including the main threads  */
+ 
+ 	tmp = _papi_hwi_init_global_threads(  );
+ 	if ( tmp ) {
+@@ -1161,9 +1177,9 @@ PAPI_library_init( int version )
+ 		papi_return( init_retval );
+ 	}
+ 
+-	/* Initialize component globals */
++	/* Initialize perf_event, perf_event_uncore components */
+ 
+-	tmp = _papi_hwi_init_global(  );
++	tmp = _papi_hwi_init_global( 1 ); /* Selector 1 for only perf_event, perf_event_uncore */
+ 	if ( tmp ) {
+ 		init_retval = tmp;
+ 		_papi_hwi_shutdown_global_internal(  );
+diff --git a/src/papi_internal.c b/src/papi_internal.c
+index 5a1ccd433..e6dd319c2 100644
+--- a/src/papi_internal.c
++++ b/src/papi_internal.c
+@@ -1928,11 +1928,13 @@ int papi_num_components = ( sizeof ( _papi_hwd ) / sizeof ( *_papi_hwd ) ) - 1;
+  * Routine that initializes all available components.
+  * A component is available if a pointer to its info vector
+  * appears in the NULL terminated_papi_hwd table.
++ * Modified to accept an arg: 0=do not init perf_event or 
++ * perf_event_uncore. 1=init ONLY perf_event or perf_event_uncore.
+  */
+ int
+-_papi_hwi_init_global( void )
++_papi_hwi_init_global( int PE_OR_PEU )
+ {
+-        int retval, i = 0;
++        int retval, is_pe_peu, i = 0;
+ 
+ 	retval = _papi_hwi_innoculate_os_vector( &_papi_os_vector );
+ 	if ( retval != PAPI_OK ) {
+@@ -1940,14 +1942,16 @@ _papi_hwi_init_global( void )
+ 	}
+ 
+ 	while ( _papi_hwd[i] ) {
+-
++      is_pe_peu = 0;
++      if (strcmp(_papi_hwd[i]->cmp_info.name, "perf_event") == 0) is_pe_peu=1;
++      if (strcmp(_papi_hwd[i]->cmp_info.name, "perf_event_uncore") == 0) is_pe_peu=1;
+ 	   retval = _papi_hwi_innoculate_vector( _papi_hwd[i] );
+ 	   if ( retval != PAPI_OK ) {
+ 	      return retval;
+ 	   }
+ 
+ 	   /* We can be disabled by user before init */
+-	   if (!_papi_hwd[i]->cmp_info.disabled) {
++	   if (!_papi_hwd[i]->cmp_info.disabled && (PE_OR_PEU == is_pe_peu)) {
+ 	      retval = _papi_hwd[i]->init_component( i );
+ 	      _papi_hwd[i]->cmp_info.disabled=retval;
+ 
+diff --git a/src/papi_internal.h b/src/papi_internal.h
+index 6492fea4e..e0f5acd74 100644
+--- a/src/papi_internal.h
++++ b/src/papi_internal.h
+@@ -467,7 +467,7 @@ int _papi_hwi_read( hwd_context_t * context, EventSetInfo_t * ESI,
+ 		    long long *values );
+ int _papi_hwi_cleanup_eventset( EventSetInfo_t * ESI );
+ int _papi_hwi_convert_eventset_to_multiplex( _papi_int_multiplex_t * mpx );
+-int _papi_hwi_init_global( void );
++int _papi_hwi_init_global( int PE_OR_PEU );
+ int _papi_hwi_init_global_internal( void );
+ int _papi_hwi_init_os(void);
+ void _papi_hwi_init_errors(void);
