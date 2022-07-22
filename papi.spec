@@ -11,7 +11,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 6.0.0
-Release: 11%{?dist}
+Release: 12%{?dist}
 License: BSD
 Requires: papi-libs = %{version}-%{release}
 URL: http://icl.cs.utk.edu/papi/
@@ -193,6 +193,9 @@ find %{buildroot} -type f -executable ! -iname "*.py" ! -iname "*.sh" | xargs ch
 %endif
 
 %changelog
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 6.0.0-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
 * Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 6.0.0-11
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
