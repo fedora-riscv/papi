@@ -11,7 +11,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 7.0.0
-Release: 3%{?dist}
+Release: 3.rv64%{?dist}
 License: BSD
 Requires: papi-libs = %{version}-%{release}
 URL: http://icl.cs.utk.edu/papi/
@@ -19,6 +19,8 @@ Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
 Patch1: papi-python3.patch
 Patch5: papi-nostatic.patch
 Patch6: papi-configure-c99.patch
+Patch9: 0001-Add-initial-support-for-riscv64.patch
+
 BuildRequires: make
 BuildRequires: autoconf
 BuildRequires: doxygen
@@ -89,6 +91,7 @@ the PAPI user-space libraries and interfaces.
 %patch1 -p1 -b .python3
 %patch5 -p1
 %patch6 -p1
+%patch9 -p1 -b .riscv64
 
 %build
 
@@ -183,6 +186,9 @@ find %{buildroot} -type f -executable ! -iname "*.py" ! -iname "*.sh" | xargs ch
 %endif
 
 %changelog
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 7.0.0-3.rv64
+- cherry-pick davidlt's riscv64 support patch.
+
 * Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 7.0.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
 
@@ -191,6 +197,9 @@ find %{buildroot} -type f -executable ! -iname "*.py" ! -iname "*.sh" | xargs ch
 
 * Wed Nov 16 2022 William Cohen <wcohen@redhat.com> - 7.0.0-1
 - Rebase to official papi-7.0.0.
+
+* Fri Sep 23 2022 David Abdurachmanov <davidlt@rivosinc.com> - 6.0.0-12.0.riscv64
+- Add initial support for riscv64
 
 * Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 6.0.0-12
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild

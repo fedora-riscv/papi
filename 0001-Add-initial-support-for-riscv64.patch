@@ -1,0 +1,98 @@
+From 8467f9cfe483bf4d0c14c1fba200cb6fb429f996 Mon Sep 17 00:00:00 2001
+From: David Abdurachmanov <davidlt@rivosinc.com>
+Date: Fri, 23 Sep 2022 09:42:45 +0300
+Subject: [PATCH] Add initial support for riscv64
+
+Signed-off-by: David Abdurachmanov <davidlt@rivosinc.com>
+---
+ src/configure         | 2 +-
+ src/configure.in      | 2 +-
+ src/libpfm4/config.mk | 3 +++
+ src/linux-context.h   | 2 ++
+ src/linux-timer.c     | 2 +-
+ src/mb.h              | 3 +++
+ 6 files changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/src/configure b/src/configure
+index fb18bf4..4f5ab04 100755
+--- a/src/configure
++++ b/src/configure
+@@ -4709,7 +4709,7 @@ _ACEOF
+ 
+ # First set pthread-mutexes based on arch
+ case $arch in
+-  aarch64|arm*|parisc*)
++  aarch64|arm*|parisc*|riscv*)
+     pthread_mutexes=yes
+     CFLAGS="$CFLAGS -DUSE_PTHREAD_MUTEXES"
+     echo "forcing use of pthread mutexes... " >&6
+diff --git a/src/configure.in b/src/configure.in
+index f78cca2..9b4ae9f 100644
+--- a/src/configure.in
++++ b/src/configure.in
+@@ -410,7 +410,7 @@ AC_DEFINE_UNQUOTED(CPU,$CPU,[cpu type])
+ 
+ # First set pthread-mutexes based on arch                                       
+ case $arch in
+-  aarch64|arm*|parisc*)
++  aarch64|arm*|parisc*|riscv*)
+     pthread_mutexes=yes
+     CFLAGS="$CFLAGS -DUSE_PTHREAD_MUTEXES"
+     echo "forcing use of pthread mutexes... " >&6
+diff --git a/src/libpfm4/config.mk b/src/libpfm4/config.mk
+index daa982e..8e8e482 100644
+--- a/src/libpfm4/config.mk
++++ b/src/libpfm4/config.mk
+@@ -177,6 +177,9 @@ ifeq ($(ARCH),cell)
+ CONFIG_PFMLIB_CELL=y
+ endif
+ 
++ifeq ($(ARCH),riscv64)
++CONFIG_PFMLIB_ARCH_RISCV64=y
++endif
+ 
+ #
+ # you shouldn't have to touch anything beyond this point
+diff --git a/src/linux-context.h b/src/linux-context.h
+index 858c4e9..de52ee4 100644
+--- a/src/linux-context.h
++++ b/src/linux-context.h
+@@ -37,6 +37,8 @@ typedef ucontext_t hwd_ucontext_t;
+ #define OVERFLOW_ADDRESS(ctx) ctx.ucontext->uc_mcontext.pc
+ #elif defined(__hppa__)
+ #define OVERFLOW_ADDRESS(ctx) ctx.ucontext->uc_mcontext.sc_iaoq[0]
++#elif defined(__riscv)
++#define OVERFLOW_ADDRESS(ctx) ctx.ucontext->uc_mcontext.__gregs[REG_PC]
+ #else
+ #error "OVERFLOW_ADDRESS() undefined!"
+ #endif
+diff --git a/src/linux-timer.c b/src/linux-timer.c
+index 71b4aa0..97dfc53 100644
+--- a/src/linux-timer.c
++++ b/src/linux-timer.c
+@@ -281,7 +281,7 @@ static inline long long get_cycles()
+     return retval;
+ }
+ 
+-#elif (defined(__arm__) || defined(__mips__) || defined(__hppa__))
++#elif (defined(__arm__) || defined(__mips__) || defined(__hppa__) || defined(__riscv))
+ static inline long long
+ get_cycles( void )
+ {
+diff --git a/src/mb.h b/src/mb.h
+index 1019691..0b82a9d 100644
+--- a/src/mb.h
++++ b/src/mb.h
+@@ -39,6 +39,9 @@
+ #elif defined(__aarch64__)
+ #define rmb()           asm volatile("dmb ld" ::: "memory")
+ 
++#elif defined(__riscv)
++#define rmb()           asm volatile("fence ir, ir" ::: "memory")
++
+ #elif defined(__mips__)
+ #define rmb()           asm volatile(                                   \
+                                 ".set   mips2\n\t"                      \
+-- 
+2.35.1
+
