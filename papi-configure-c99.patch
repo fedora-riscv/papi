@@ -1,0 +1,87 @@
+Avoid implicit ints and implicit function declarations.  This patch
+needs to be upstreamed because it is custom, papi-specific autoconf
+checks.
+
+diff --git a/src/configure b/src/configure
+index 78dab84107dc897e..99c8f63bd020d3df 100755
+--- a/src/configure
++++ b/src/configure
+@@ -4985,7 +4985,8 @@ $as_echo_n "checking for working gettid... " >&6; }
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+ #include <sys/types.h>
+-                main() { pid_t a = gettid(); }
++                #include <unistd.h>
++                int main() { pid_t a = gettid(); }
+ _ACEOF
+ if ac_fn_c_try_link "$LINENO"; then :
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+@@ -5002,7 +5003,8 @@ $as_echo_n "checking for working syscall(SYS_gettid)... " >&6; }
+ /* end confdefs.h.  */
+ #include <sys/types.h>
+                                 #include <sys/syscall.h>
+-                                main() { pid_t a = syscall(SYS_gettid); }
++                                #include <unistd.h>
++                                int main() { pid_t a = syscall(SYS_gettid); }
+ _ACEOF
+ if ac_fn_c_try_link "$LINENO"; then :
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+@@ -5080,7 +5082,7 @@ else
+                                      #include <stdio.h>
+                                      #include <time.h>
+                                      #include <syscall.h>
+-                                     main() {
++                                     int main() {
+                                        struct timespec t1, t2;
+                                        double seconds;
+                                        if (syscall(__NR_clock_gettime,CLOCK_REALTIME_HR,&t1) == -1) exit(1);
+@@ -5115,7 +5117,7 @@ else
+                                                  #include <stdio.h>
+                                                  #include <time.h>
+                                                  #include <syscall.h>
+-                                                 main() {
++                                                 int main() {
+                                                    struct timespec t1, t2;
+                                                    double seconds;
+                                                    if (syscall(__NR_clock_gettime,CLOCK_REALTIME,&t1) == -1) exit(1);
+diff --git a/src/configure.in b/src/configure.in
+index efcbd59405ac42bc..686b489f10c86839 100644
+--- a/src/configure.in
++++ b/src/configure.in
+@@ -577,14 +577,16 @@ fi
+ 
+ AC_MSG_CHECKING(for working gettid)
+ AC_LINK_IFELSE([AC_LANG_SOURCE([#include <sys/types.h>
+-                main() { pid_t a = gettid(); }])],
++                #include <unistd.h>
++                int main() { pid_t a = gettid(); }])],
+                [AC_MSG_RESULT(yes)
+                 AC_DEFINE(HAVE_GETTID, 1, [Full gettid function])],
+                [AC_MSG_RESULT(no)
+                 AC_MSG_CHECKING(for working syscall(SYS_gettid))
+                 AC_LINK_IFELSE([AC_LANG_SOURCE([#include <sys/types.h>
+                                 #include <sys/syscall.h>
+-                                main() { pid_t a = syscall(SYS_gettid); }])],
++                                #include <unistd.h>
++                                int main() { pid_t a = syscall(SYS_gettid); }])],
+                                [AC_MSG_RESULT(yes)
+                                 AC_DEFINE(HAVE_SYSCALL_GETTID, 1, [gettid syscall function])],
+                                [AC_MSG_RESULT(no)]) ])
+@@ -625,7 +627,7 @@ AC_ARG_WITH(walltimer,
+                                      #include <stdio.h>
+                                      #include <time.h>
+                                      #include <syscall.h>
+-                                     main() {
++                                     int main() {
+                                        struct timespec t1, t2;
+                                        double seconds;
+                                        if (syscall(__NR_clock_gettime,CLOCK_REALTIME_HR,&t1) == -1) exit(1);
+@@ -646,7 +648,7 @@ AC_ARG_WITH(walltimer,
+                                                  #include <stdio.h>
+                                                  #include <time.h>
+                                                  #include <syscall.h>
+-                                                 main() {
++                                                 int main() {
+                                                    struct timespec t1, t2;
+                                                    double seconds;
+                                                    if (syscall(__NR_clock_gettime,CLOCK_REALTIME,&t1) == -1) exit(1);
