@@ -10,17 +10,15 @@
 %{!?with_pcp: %global with_pcp 1}
 Summary: Performance Application Programming Interface
 Name: papi
-Version: 7.0.0
-Release: 3.rv64%{?dist}
+Version: 7.0.1
+Release: 4.rv64%{?dist}
 License: BSD
 Requires: papi-libs = %{version}-%{release}
 URL: http://icl.cs.utk.edu/papi/
 Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
 Patch1: papi-python3.patch
 Patch5: papi-nostatic.patch
-Patch6: papi-configure-c99.patch
 Patch9: 0001-Add-initial-support-for-riscv64.patch
-
 BuildRequires: make
 BuildRequires: autoconf
 BuildRequires: doxygen
@@ -30,7 +28,7 @@ BuildRequires: kernel-headers >= 2.6.32
 BuildRequires: chrpath
 BuildRequires: lm_sensors-devel
 %if %{without bundled_libpfm}
-BuildRequires: libpfm-devel >= 4.6.0-1
+BuildRequires: libpfm-devel >= 4.13.0-1
 %if %{with_static}
 BuildRequires: libpfm-static >= 4.6.0-1
 %endif
@@ -90,7 +88,6 @@ the PAPI user-space libraries and interfaces.
 %setup -q
 %patch1 -p1 -b .python3
 %patch5 -p1
-%patch6 -p1
 %patch9 -p1 -b .riscv64
 
 %build
@@ -186,6 +183,21 @@ find %{buildroot} -type f -executable ! -iname "*.py" ! -iname "*.sh" | xargs ch
 %endif
 
 %changelog
+* Sat Feb 3 2024 Guoguo <i@qwq.trade> - 7.0.1-4.rv64
+- Update from fedoraproject
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 7.0.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Mar 28 2023 William Cohen <wcohen@redhat.com> - 7.0.1-3
+- Rebuild with libpfm-4.13.0.
+
+* Wed Mar 15 2023 William Cohen <wcohen@redhat.com> - 7.0.1-2
+- Bump NVR and rebuild.
+
+* Tue Mar 14 2023 William Cohen <wcohen@redhat.com> - 7.0.1-1
+- Rebase to official papi-7.0.1. (rhbz#2177906)
+
 * Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 7.0.0-3.rv64
 - cherry-pick davidlt's riscv64 support patch.
 
